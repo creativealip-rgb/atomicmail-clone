@@ -1,0 +1,35 @@
+.cta {
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-3xl);
+  padding: var(--space-12) var(--space-6);
+  margin: var(--space-12) 0;
+}
+.cta h2 {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-3);
+}
+.cta p {
+  font-size: var(--fs-base);
+  color: var(--color-neutral-700);
+  max-width: 540px;
+  margin: 0 auto var(--space-6);
+  line-height: var(--lh-loose);
+}
+.cta code {
+  font-size: 13px;
+  background: var(--bg-base);
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  font-family: ui-monospace, monospace;
+  color: var(--color-neutral-800);
+}
+.buttons {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}

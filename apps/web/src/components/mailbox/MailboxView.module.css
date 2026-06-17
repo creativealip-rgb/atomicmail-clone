@@ -1,0 +1,79 @@
+.view { display: flex; flex-direction: column; flex: 1; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--color-neutral-800);
+  cursor: pointer;
+}
+.toolbarBtn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--color-neutral-800);
+  border-radius: var(--r-md);
+  transition: background var(--d-fast) var(--ease-default);
+}
+.toolbarBtn:hover { background: var(--bg-hover); }
+
+.list { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+
+.row { border-bottom: 1px solid var(--border-subtle); transition: background var(--d-fast) var(--ease-default); }
+.row:hover { background: var(--bg-hover); }
+
+.rowLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  color: inherit;
+}
+.rowLink:hover { text-decoration: none; }
+
+.checkbox { display: flex; align-items: center; }
+
+.rowContent { flex: 1; min-width: 0; }
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+.sender { font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--color-neutral-900); }
+.time { font-size: var(--fs-sm); color: var(--color-neutral-500); font-variant-numeric: tabular-nums; }
+
+.subject {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  color: var(--color-neutral-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preview {
+  font-size: var(--fs-sm);
+  color: var(--color-neutral-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-500);
+  font-size: var(--fs-base);
+}

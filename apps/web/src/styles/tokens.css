@@ -1,0 +1,175 @@
+/**
+ * Design tokens — extracted from atomicmail.io
+ * Source: /root/projects/atomicmail-clone/docs/desain.md section 2-7
+ *
+ * Use these as CSS variables. Never hard-code values in components.
+ */
+
+:root {
+  /* ─── Brand Colors ─── */
+  --color-brand-blue: #067df7;
+  --color-brand-blue-deep: #0561ff;
+  --color-brand-blue-darker: #0c79fe;
+  --color-brand-purple: #8a8ffb;
+  --color-brand-purple-light: #c091ff;
+  --color-brand-purple-deep: #6648ff;
+  --color-brand-lavender: #7d7bdb;
+  --color-brand-cyan: #7dcfff;
+  --color-brand-teal: #0ce884;
+  --color-brand-green: #0df189;
+  --color-brand-green-deep: #00b95c;
+  --color-brand-red: #ff3636;
+  --color-brand-orange: #fbbc04;
+
+  /* ─── Neutral Palette (light) ─── */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #fdfdfd;
+  --color-neutral-100: #f5f5f4;     /* body bg */
+  --color-neutral-200: #eaeaea;     /* borders */
+  --color-neutral-300: #cfcfcf;
+  --color-neutral-400: #ababab;
+  --color-neutral-500: #969696;
+  --color-neutral-600: #8e8e93;     /* secondary text */
+  --color-neutral-700: #777776;
+  --color-neutral-800: #5f5f5e;     /* primary text alt */
+  --color-neutral-900: #000000;
+
+  /* ─── Surface ─── */
+  --bg-base: var(--color-neutral-100);
+  --bg-surface: var(--color-neutral-0);
+  --bg-elevated: var(--color-neutral-0);
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.08);
+  --border-subtle: var(--color-neutral-200);
+  --border-strong: var(--color-neutral-300);
+
+  /* ─── Status ─── */
+  --color-success: var(--color-brand-green-deep);
+  --color-warning: var(--color-brand-orange);
+  --color-error: var(--color-brand-red);
+  --color-info: var(--color-brand-cyan);
+
+  /* ─── Typography ─── */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --fs-xs: 10px;
+  --fs-sm: 12px;
+  --fs-base-sm: 15px;
+  --fs-base: 16px;
+  --fs-md: 17px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 22px;
+  --fs-3xl: 26px;
+  --fs-4xl: 34px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.4;
+  --lh-base: 1.5;
+  --lh-loose: 1.6;
+
+  /* ─── Spacing ─── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ─── Radius ─── */
+  --r-none: 0;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-3xl: 24px;
+  --r-pill: 32px;
+  --r-full: 9999px;
+
+  /* ─── Shadow ─── */
+  --shadow-xs: 0 2px 6px 0 rgba(0, 0, 0, 0.10);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.10), 0 0 0 2px rgba(0, 0, 0, 0.20);
+  --shadow-xl: 3px 3px 21px 0 rgba(0, 0, 0, 0.30);
+  --shadow-focus: 0 0 0 2px rgba(0, 0, 0, 0.40);
+
+  /* ─── Motion ─── */
+  --d-instant: 100ms;
+  --d-fast: 200ms;
+  --d-base: 300ms;
+  --d-smooth: 400ms;
+  --d-slow: 500ms;
+  --ease-default: ease;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+
+  /* ─── Z-index ─── */
+  --z-base: 1;
+  --z-sticky: 2;
+  --z-sidebar: 10;
+  --z-popover: 19;
+  --z-dropdown: 21;
+  --z-modal: 9999;
+  --z-toast: 999999999;
+
+  /* ─── Layout ─── */
+  --sidebar-width: 280px;
+  --topbar-height: 56px;
+}
+
+/* ─── Dark Theme ─── */
+[data-theme="dark"] {
+  --bg-base: #0f0f0f;
+  --bg-surface: #1a1a1c;
+  --bg-elevated: #242426;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.12);
+  --border-subtle: #2a2a2c;
+  --border-strong: #3a3a3c;
+
+  --color-neutral-0: #0f0f0f;
+  --color-neutral-50: #1a1a1c;
+  --color-neutral-100: #242426;
+  --color-neutral-200: #2a2a2c;
+  --color-neutral-300: #3a3a3c;
+  --color-neutral-400: #4a4a4c;
+  --color-neutral-500: #777776;
+  --color-neutral-600: #ababab;
+  --color-neutral-700: #c5c5c5;
+  --color-neutral-800: #cfcfcf;
+  --color-neutral-900: #f5f5f4;
+}
+
+/* System preference fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-base: #0f0f0f;
+    --bg-surface: #1a1a1c;
+    --bg-elevated: #242426;
+    --bg-hover: rgba(255, 255, 255, 0.06);
+    --bg-active: rgba(255, 255, 255, 0.12);
+    --border-subtle: #2a2a2c;
+    --border-strong: #3a3a3c;
+
+    --color-neutral-0: #0f0f0f;
+    --color-neutral-50: #1a1a1c;
+    --color-neutral-100: #242426;
+    --color-neutral-200: #2a2a2c;
+    --color-neutral-300: #3a3a3c;
+    --color-neutral-400: #4a4a4c;
+    --color-neutral-500: #777776;
+    --color-neutral-600: #ababab;
+    --color-neutral-700: #c5c5c5;
+    --color-neutral-800: #cfcfcf;
+    --color-neutral-900: #f5f5f4;
+  }
+}

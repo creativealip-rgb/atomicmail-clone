@@ -1,0 +1,33 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# build
+dist
+build
+.vite
+.turbo
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor
+.vscode
+.idea
+.DS_Store
+*.swp
+
+# storybook
+storybook-static
+
+# coverage
+coverage
+*.lcov

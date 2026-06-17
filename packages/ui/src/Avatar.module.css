@@ -1,0 +1,12 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-full);
+  color: var(--color-neutral-0);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  user-select: none;
+  flex-shrink: 0;
+}
+.img { border-radius: var(--r-full); object-fit: cover; }

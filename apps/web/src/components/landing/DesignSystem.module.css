@@ -1,0 +1,123 @@
+.header { text-align: center; margin-bottom: var(--space-10); }
+.header h2 {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-2);
+}
+.header p {
+  font-size: var(--fs-lg);
+  color: var(--color-neutral-600);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--space-5);
+}
+
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl);
+  padding: var(--space-5);
+}
+
+.panelTitle {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  margin: 0 0 var(--space-4);
+  color: var(--color-neutral-800);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--fs-sm);
+}
+
+/* Colors */
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+.swatch { display: flex; flex-direction: column; gap: 6px; }
+.chip {
+  height: 56px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-subtle);
+}
+.swatchMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.swatchMeta code { font-size: var(--fs-xs); color: var(--color-neutral-700); }
+.hex { color: var(--color-neutral-500); font-family: ui-monospace, monospace; }
+
+/* Type */
+.typeList { display: flex; flex-direction: column; gap: var(--space-3); }
+.typeRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.typeRow:last-child { border-bottom: none; }
+.typeLabel {
+  font-size: var(--fs-xs);
+  color: var(--color-neutral-500);
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+.typeSample {
+  font-weight: var(--fw-semibold);
+  color: var(--color-neutral-900);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Radius */
+.radiusList { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.radiusItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 80px;
+}
+.radiusBox {
+  width: 56px;
+  height: 56px;
+  background: var(--color-neutral-200);
+  border: 1px solid var(--border-subtle);
+}
+.radiusLabel {
+  font-size: var(--fs-xs);
+  color: var(--color-neutral-600);
+  font-family: ui-monospace, monospace;
+}
+
+/* Shadows */
+.shadowList { display: flex; flex-direction: column; gap: var(--space-5); }
+.shadowItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.shadowBox {
+  width: 80px;
+  height: 56px;
+  background: var(--bg-surface);
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+}
+.shadowLabel {
+  font-size: var(--fs-xs);
+  color: var(--color-neutral-700);
+  font-family: ui-monospace, monospace;
+}

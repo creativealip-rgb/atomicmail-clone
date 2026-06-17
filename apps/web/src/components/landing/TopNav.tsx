@@ -1,0 +1,32 @@
+import { Link } from "react-router-dom";
+import { Logo } from "@/components/landing/Logo";
+import styles from "./TopNav.module.css";
+
+export function TopNav() {
+  return (
+    <header className={styles.nav}>
+      <Link to="/" className={styles.brand}>
+        <Logo size={32} />
+        <span className={styles.brandText}>Atomic Mail Clone</span>
+        <span className={styles.beta}>demo</span>
+      </Link>
+
+      <nav className={styles.links}>
+        <a href="#features">Features</a>
+        <a href="#stack">Stack</a>
+        <a href="#design">Design system</a>
+        <a href="#architecture">Architecture</a>
+        <a
+          href="https://github.com/creativealip-rgb/atomicmail-clone"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GitHub →
+        </a>
+        <Link to="/app/auth/sign-in" className={styles.cta}>
+          Launch app →
+        </Link>
+      </nav>
+    </header>
+  );
+}
