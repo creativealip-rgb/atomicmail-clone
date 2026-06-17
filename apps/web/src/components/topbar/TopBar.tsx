@@ -4,6 +4,7 @@ import { setSearchQuery } from "@/store/slices/uiSlice";
 import { open as openComposer } from "@/store/slices/composerSlice";
 import { AvatarMenu } from "./AvatarMenu";
 import { ThemeToggle } from "./ThemeToggle";
+import { isDemoMode } from "@/services/api/client";
 import styles from "./TopBar.module.css";
 
 export function TopBar() {
@@ -14,6 +15,11 @@ export function TopBar() {
 
   return (
     <header className={styles.topbar}>
+      {isDemoMode() && (
+        <div className={styles.demoBadge} role="status">
+          🎯 DEMO MODE — using seed data, no real API calls
+        </div>
+      )}
       <form
         className={styles.search}
         onSubmit={(e) => {
