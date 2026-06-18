@@ -6,9 +6,9 @@ interface Props {
 }
 
 /**
- * Chainmail weave logo — 4 interlocking rings forming a square pattern.
+ * Chainmail weave logo — 4 interlocking rings in 2×2 grid.
  * Concept: medieval mail armor × crypto chain links.
- * Outer ring: brand/purple-deep · inner: teal→blue gradient
+ * Stroke: teal → blue → purple gradient.
  */
 export function Logo({ size = 32, withText = false }: Props) {
   return (
@@ -29,17 +29,13 @@ export function Logo({ size = 32, withText = false }: Props) {
             <stop offset="100%" stopColor="#6648FF" />
           </linearGradient>
         </defs>
-        {/* Four interlocking rings in 2x2 grid, each overlaps its 2 neighbors */}
-        {/* top-left ring */}
-        <circle cx="11" cy="11" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
-        {/* top-right ring */}
-        <circle cx="21" cy="11" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
-        {/* bottom-left ring */}
-        <circle cx="11" cy="21" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
-        {/* bottom-right ring */}
-        <circle cx="21" cy="21" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
-        {/* center accent dot */}
-        <circle cx="16" cy="16" r="2" fill="url(#chainGrad)" />
+        {/* Four rings in 2×2 grid — non-overlapping, distinct gaps for clarity at small sizes */}
+        <circle cx="10" cy="10" r="5.5" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        <circle cx="22" cy="10" r="5.5" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        <circle cx="10" cy="22" r="5.5" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        <circle cx="22" cy="22" r="5.5" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        {/* Center accent — the "link" that ties the 4 rings together */}
+        <circle cx="16" cy="16" r="2.5" fill="url(#chainGrad)" />
       </svg>
       {withText && <span className={styles.text}>Chainmail</span>}
     </span>
