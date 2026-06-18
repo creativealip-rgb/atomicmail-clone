@@ -1,0 +1,6 @@
+{
+  "label": "coinbase-sell-eth",
+  "from": "no-reply@coinbase.com",
+  "subject": "Your sell order has been completed",
+  "bodyText": "You sold 2.5 ETH for $8,420.50 USD on Jun 15, 2026."
+}

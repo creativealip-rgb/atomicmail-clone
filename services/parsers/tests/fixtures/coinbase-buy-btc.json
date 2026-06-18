@@ -1,0 +1,7 @@
+{
+  "label": "coinbase-buy-btc",
+  "from": "no-reply@coinbase.com",
+  "fromName": "Coinbase",
+  "subject": "Your buy order has been completed",
+  "bodyText": "Hi Alip,\n\nYou bought 0.5 BTC for $32,145.00 USD on Jun 18, 2026.\n\nOrder ID: abc-123\nTotal: $32,145.00\n\nThanks for using Coinbase."
+}

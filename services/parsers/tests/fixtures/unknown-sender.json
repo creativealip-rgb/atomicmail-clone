@@ -1,0 +1,6 @@
+{
+  "label": "unknown-sender",
+  "from": "newsletter@random.com",
+  "subject": "Weekly digest",
+  "bodyText": "Top stories this week. Click here."
+}

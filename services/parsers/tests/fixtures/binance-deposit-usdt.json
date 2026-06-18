@@ -1,0 +1,7 @@
+{
+  "label": "binance-deposit-usdt",
+  "from": "noreply@binance.com",
+  "fromName": "Binance",
+  "subject": "[Binance] Deposit Confirmation - 1000 USDT",
+  "bodyText": "Dear user,\n\nYour deposit of 1000 USDT has been received and confirmed on Jun 18, 2026.\n\nNetwork: TRC20 (Tron)\nTxID: 0xabc...123\nAmount: 1000 USDT\nStatus: Confirmed"
+}

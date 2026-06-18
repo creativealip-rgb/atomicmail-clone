@@ -31,7 +31,8 @@ app.route("/api/health", health);
 app.route("/api/auth", auth);
 app.route("/api/aliases", aliases);
 app.route("/api/ingest", ingestRoute);
-app.route("/api/messages", messagesRoute);
+// messagesRoute now mounts both /api/messages and /api/receipts
+app.route("/api", messagesRoute);
 
 app.get("/", (c) => c.text("chainmail-api · see /api/health"));
 

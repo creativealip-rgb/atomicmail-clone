@@ -1,0 +1,6 @@
+{
+  "label": "binance-withdrawal-btc",
+  "from": "do-not-reply@binance.com",
+  "subject": "[Binance] Withdrawal Successful",
+  "bodyText": "Your withdrawal of 0.1 BTC has been successful.\n\nNetwork: BTC\nAmount: 0.1 BTC\nTxID: 0xdef...456"
+}

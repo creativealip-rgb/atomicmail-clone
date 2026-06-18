@@ -1,0 +1,6 @@
+{
+  "label": "coinbase-deposit-usdc",
+  "from": "no-reply@coinbase.com",
+  "subject": "Deposit confirmed",
+  "bodyText": "Your deposit of 1000 USDC has been received and is now available in your Coinbase account."
+}

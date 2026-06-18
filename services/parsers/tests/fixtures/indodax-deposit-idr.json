@@ -1,0 +1,7 @@
+{
+  "label": "indodax-deposit-idr",
+  "from": "noreply@indodax.com",
+  "fromName": "Indodax",
+  "subject": "Deposit Berhasil",
+  "bodyText": "Deposit IDR 5,000,000 telah berhasil masuk ke akun Anda.\nSaldo saat ini: IDR 5,000,000"
+}

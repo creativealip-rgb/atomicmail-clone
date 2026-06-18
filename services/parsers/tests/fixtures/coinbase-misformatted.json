@@ -1,0 +1,6 @@
+{
+  "label": "coinbase-misformatted",
+  "from": "no-reply@coinbase.com",
+  "subject": "Account security alert",
+  "bodyText": "We noticed a new sign-in. If this wasn't you, secure your account."
+}

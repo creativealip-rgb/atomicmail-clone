@@ -8,7 +8,7 @@
  * Body: JSON matching EmailEnvelope (from, fromName, subject, bodyText, bodyHtml, receivedAt)
  *       + `to` field — the alias email address it was sent to.
  *
- * Stores in messages table, runs parsers, attaches parserKey if matched.
+ * Stores in messages table, runs parsers, normalizes into receipts table.
  *
  * NOTE: W3 stores plaintext body. W3.5 will add per-user keypair encryption.
  */
@@ -16,13 +16,13 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { aliases, messages } from "../db/schema/index.js";
+import { aliases, messages, receipts } from "../db/schema/index.js";
 import { env } from "../lib/env.js";
-import { parseEmail } from "parsers";
+import { parseEmail, type EmailKind } from "parsers";
 import type { ChainmailVars } from "../middleware/auth.js";
 
 const envelopeSchema = z.object({
-  to: z.string().email(), // alias address (recipient)
+  to: z.string().email(),
   from: z.string().min(1),
   fromName: z.string().optional(),
   subject: z.string().default(""),
@@ -31,6 +31,29 @@ const envelopeSchema = z.object({
   messageIdHeader: z.string().optional(),
   receivedAt: z.coerce.date().default(() => new Date()),
 });
+
+/** Map our EmailKind → receipt.type and receipt.source */
+function normalizeReceipt(parsed: NonNullable<ReturnType<typeof parseEmail>>) {
+  const kindToType: Record<EmailKind, string> = {
+    cex_trade: parsed.data.side === "sell" || parsed.data.side === "sold" ? "sell" : "buy",
+    cex_deposit: "deposit",
+    cex_withdrawal: "withdraw",
+    dex_swap: "swap",
+    nft_mint: "mint",
+    tx_notification: "transfer",
+    unknown: "unknown",
+  };
+  const sourceMap: Record<string, string> = {
+    coinbase: "cex",
+    binance: "cex",
+    indodax: "cex",
+    ethereum: "explorer",
+  };
+  return {
+    type: kindToType[parsed.kind] ?? "unknown",
+    source: sourceMap[parsed.source] ?? parsed.source,
+  };
+}
 
 export const ingestRoute = new Hono<{ Variables: ChainmailVars }>();
 
@@ -49,7 +72,7 @@ ingestRoute.post("/", async (c) => {
   }
   const email = parsed.data;
 
-  // Find alias by email (the part before @ doesn't matter, we look up by full address)
+  // Find alias by email
   const [alias] = await db
     .select()
     .from(aliases)
@@ -60,7 +83,7 @@ ingestRoute.post("/", async (c) => {
   }
 
   // Run parsers
-  const receipt = parseEmail({
+  const parsedReceipt = parseEmail({
     from: email.from,
     fromName: email.fromName,
     subject: email.subject,
@@ -69,8 +92,8 @@ ingestRoute.post("/", async (c) => {
     receivedAt: email.receivedAt,
   });
 
-  // Insert message
-  const [inserted] = await db
+  // Insert message first (we need its ID for the receipt)
+  const [insertedMsg] = await db
     .insert(messages)
     .values({
       aliasId: alias.id,
@@ -82,18 +105,47 @@ ingestRoute.post("/", async (c) => {
       bodyHtml: email.bodyHtml ?? null,
       messageIdHeader: email.messageIdHeader ?? null,
       receivedAt: email.receivedAt,
-      parserKey: receipt?.parserKey ?? null,
-      parsedAt: receipt ? new Date() : null,
+      parserKey: parsedReceipt?.parserKey ?? null,
+      parsedAt: parsedReceipt ? new Date() : null,
     })
-    .returning({ id: messages.id, parserKey: messages.parserKey });
+    .returning({ id: messages.id });
+
+  let receiptId: string | null = null;
+  if (parsedReceipt) {
+    const norm = normalizeReceipt(parsedReceipt);
+    // Strip commas/spaces from amount before numeric insert ("5,000,000" → "5000000")
+    const rawAmount = typeof parsedReceipt.data.amount === "string" ? parsedReceipt.data.amount : null;
+    const cleanAmount = rawAmount?.replace(/[,\s]/g, "") ?? null;
+    const [insertedReceipt] = await db
+      .insert(receipts)
+      .values({
+        messageId: insertedMsg.id,
+        source: norm.source,
+        type: norm.type,
+        chain: typeof parsedReceipt.data.chain === "string" ? parsedReceipt.data.chain : null,
+        asset: typeof parsedReceipt.data.asset === "string" ? parsedReceipt.data.asset.toUpperCase() : null,
+        amount: cleanAmount,
+        txHash: typeof parsedReceipt.data.txHash === "string" ? parsedReceipt.data.txHash : null,
+        counterparty: parsedReceipt.source,
+        status: "confirmed",
+        raw: parsedReceipt.data,
+        occurredAt: email.receivedAt,
+      })
+      .returning({ id: receipts.id });
+    receiptId = insertedReceipt.id;
+
+    // Backfill message.receiptId
+    await db.update(messages).set({ receiptId }).where(eq(messages.id, insertedMsg.id));
+  }
 
   return c.json(
     {
       ok: true,
-      messageId: inserted.id,
-      parserKey: inserted.parserKey,
-      parsed: receipt
-        ? { kind: receipt.kind, summary: receipt.summary, confidence: receipt.confidence }
+      messageId: insertedMsg.id,
+      receiptId,
+      parserKey: parsedReceipt?.parserKey ?? null,
+      parsed: parsedReceipt
+        ? { kind: parsedReceipt.kind, summary: parsedReceipt.summary, confidence: parsedReceipt.confidence }
         : null,
     },
     201

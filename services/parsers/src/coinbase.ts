@@ -6,7 +6,7 @@
 import type { Parser, EmailEnvelope, ParsedReceipt } from "./index.js";
 
 const RE_BUY_SELL = /(Bought|Sold)\s+([\d.,]+)\s+(\w+)\s+(?:for|at)\s+\$?([\d.,]+)/i;
-const RE_DEPOSIT = /Deposit(?:ed)?\s+([\d.,]+)\s+(\w+)/i;
+const RE_DEPOSIT = /(?:Deposit|Deposited|Deposit of)\s+(?:of\s+)?([\d.,]+)\s+(\w+)/i;
 const RE_WITHDRAWAL = /Withdrew\s+([\d.,]+)\s+(\w+)/i;
 
 export const coinbaseParser: Parser = (email: EmailEnvelope): ParsedReceipt | null => {

@@ -10,6 +10,7 @@
 import { coinbaseParser } from "./coinbase.js";
 import { binanceParser } from "./binance.js";
 import { etherscanParser } from "./etherscan.js";
+import { indodaxParser } from "./indodax.js";
 
 export type EmailKind = "cex_trade" | "cex_deposit" | "cex_withdrawal" | "dex_swap" | "nft_mint" | "tx_notification" | "unknown";
 
@@ -40,7 +41,7 @@ export interface ParsedReceipt {
 export type Parser = (email: EmailEnvelope) => ParsedReceipt | null;
 
 /** Registry: order matters. First match wins. Cheap checks first. */
-const PARSERS: Parser[] = [coinbaseParser, binanceParser, etherscanParser];
+const PARSERS: Parser[] = [coinbaseParser, binanceParser, etherscanParser, indodaxParser];
 
 /** Try each parser in order. Returns first match or null. */
 export function parseEmail(email: EmailEnvelope): ParsedReceipt | null {
@@ -57,7 +58,8 @@ export function parserKeyForSender(fromAddr: string): string | null {
   if (f.includes("coinbase")) return "coinbase";
   if (f.includes("binance")) return "binance";
   if (f.includes("etherscan") || f.includes("ethereum")) return "etherscan";
+  if (f.includes("indodax")) return "indodax";
   return null;
 }
 
-export { coinbaseParser, binanceParser, etherscanParser };
+export { coinbaseParser, binanceParser, etherscanParser, indodaxParser };

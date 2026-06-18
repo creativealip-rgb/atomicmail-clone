@@ -1,0 +1,7 @@
+{
+  "label": "etherscan-tx-eth",
+  "from": "noreply@etherscan.io",
+  "fromName": "Etherscan",
+  "subject": "Etherscan Notification - 0x7a3f9b2c...8f9a0",
+  "bodyText": "Transaction Notification:\n\nTx Hash: 0x7a3f9b2c8d1e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0\nFrom: 0x1234567890123456789012345678901234567890\nTo: 0xabcdef0123456789abcdef0123456789abcdef01\nValue: 1.5 ETH\nGas: 21000\nBlock: 19500000\nStatus: Success"
+}

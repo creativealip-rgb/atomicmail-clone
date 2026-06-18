@@ -1,12 +1,20 @@
 /**
  * Binance parser.
  * Match: from=*@binance.com OR subject contains "Binance"
+ *
+ * Tolerant regexes — Binance's email format has varied over the years.
  */
 import type { Parser, EmailEnvelope, ParsedReceipt } from "./index.js";
 
-const RE_DEPOSIT = /Deposit\s+([\d.,]+)\s+(\w+)\s+(?:received|confirmed|successful)/i;
-const RE_WITHDRAWAL = /Withdrawal\s+of\s+([\d.,]+)\s+(\w+)\s+(?:has been|successful|completed)/i;
+// "Your deposit of 1000 USDT has been received" / "Deposit 1000 USDT confirmed"
+const RE_DEPOSIT = /(?:Deposit|deposit)\s+(?:of\s+)?([\d.,]+)\s+(\w+)\s+(?:has been\s+)?(?:received|confirmed|successful)/i;
+// "Your withdrawal of 0.1 BTC has been successful" / "Withdrawal 0.1 BTC completed"
+const RE_WITHDRAWAL = /Withdrawal\s+(?:of\s+)?([\d.,]+)\s+(\w+)\s+(?:has been\s+)?(?:successful|completed|processed)/i;
+// "Buy 10 BNB at 580.50 USDT each" / "Sell 2 ETH at 3000 USDT"
+// Groups: 1=verb, 2=amount, 3=asset, 4=price
 const RE_TRADE = /(Buy|Sell)\s+([\d.,]+)\s+(\w+)\s+at\s+([\d.,]+)/i;
+// Fallback: "Amount: 1000 USDT ... Status: Confirmed"
+const RE_AMOUNT_STATUS = /Amount[:\s]+([\d.,]+)\s+(\w+)[\s\S]{0,200}?(?:Status[:\s]+)?(?:Confirmed|received|successful)/i;
 
 export const binanceParser: Parser = (email: EmailEnvelope): ParsedReceipt | null => {
   const isBinance =
@@ -16,14 +24,14 @@ export const binanceParser: Parser = (email: EmailEnvelope): ParsedReceipt | nul
 
   const text = email.bodyText;
 
-  const deposit = text.match(RE_DEPOSIT);
-  if (deposit) {
+  const deposit = text.match(RE_DEPOSIT) ?? text.match(RE_AMOUNT_STATUS);
+  if (deposit && /deposit/i.test(text)) {
     return {
       parserKey: "binance",
       kind: "cex_deposit",
       source: "binance",
-      summary: `Deposit ${deposit[1]} ${deposit[2]} received`,
-      data: { amount: deposit[1], asset: deposit[2].toUpperCase() },
+      summary: `Deposit ${deposit[1] ?? ""} ${deposit[2] ?? ""} received`,
+      data: { amount: deposit[1] ?? null, asset: (deposit[2] ?? "").toUpperCase() },
       confidence: 0.95,
     };
   }
@@ -34,8 +42,8 @@ export const binanceParser: Parser = (email: EmailEnvelope): ParsedReceipt | nul
       parserKey: "binance",
       kind: "cex_withdrawal",
       source: "binance",
-      summary: `Withdraw ${withdrawal[1]} ${withdrawal[2]} completed`,
-      data: { amount: withdrawal[1], asset: withdrawal[2].toUpperCase() },
+      summary: `Withdraw ${withdrawal[1] ?? ""} ${withdrawal[2] ?? ""} completed`,
+      data: { amount: withdrawal[1] ?? null, asset: (withdrawal[2] ?? "").toUpperCase() },
       confidence: 0.95,
     };
   }
@@ -47,11 +55,10 @@ export const binanceParser: Parser = (email: EmailEnvelope): ParsedReceipt | nul
       kind: "cex_trade",
       source: "binance",
       summary: `${trade[1]} ${trade[2]} ${trade[3]} at ${trade[4]}`,
-      data: { side: trade[1].toLowerCase(), amount: trade[2], asset: trade[3].toUpperCase(), price: trade[4] },
+      data: { side: trade[1]?.toLowerCase() ?? "", amount: trade[2] ?? null, asset: (trade[3] ?? "").toUpperCase(), price: trade[4] ?? null },
       confidence: 0.9,
     };
   }
-
   return {
     parserKey: "binance",
     kind: "unknown",

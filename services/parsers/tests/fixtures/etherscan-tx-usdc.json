@@ -1,0 +1,6 @@
+{
+  "label": "etherscan-tx-usdc",
+  "from": "noreply@etherscan.io",
+  "subject": "Etherscan Notification",
+  "bodyText": "Tx Hash: 0xdeadbeef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\nValue: 500 USDC"
+}

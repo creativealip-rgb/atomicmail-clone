@@ -1,0 +1,6 @@
+{
+  "label": "binance-buy-bnb",
+  "from": "noreply@binance.com",
+  "subject": "Buy Order Filled",
+  "bodyText": "Buy 10 BNB at 580.50 USDT each has been executed.\nTotal: 5805.00 USDT"
+}
