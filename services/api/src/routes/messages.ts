@@ -9,7 +9,7 @@
  */
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, gte, lt, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { aliases, messages, receipts, messageLabels, labels } from "../db/schema/index.js";
 import { requireAuth, type ChainmailVars } from "../middleware/auth.js";
@@ -260,7 +260,8 @@ route.get("/receipts", async (c) => {
   if (q.data.year) {
     const start = new Date(Date.UTC(q.data.year, 0, 1));
     const end = new Date(Date.UTC(q.data.year + 1, 0, 1));
-    filters.push(and() as any);
+    filters.push(gte(receipts.occurredAt, start));
+    filters.push(lt(receipts.occurredAt, end));
   }
   if (q.data.asset) filters.push(eq(receipts.asset, q.data.asset.toUpperCase()) as any);
   if (q.data.chain) filters.push(eq(receipts.chain, q.data.chain) as any);
@@ -278,5 +279,136 @@ route.get("/receipts", async (c) => {
 
   return c.json({ receipts: rows, total: rows.length });
 });
+
+// ── /api/receipts/export.csv ──────────────────────────────────
+// Streams CSV for the user's receipts (optionally filtered by year).
+// Columns are stable: date,source,type,chain,asset,amount,price_usd,fiat,fiat_amount,tx_hash,counterparty,status
+route.get("/receipts/export.csv", async (c) => {
+  const userId = c.get("userId");
+
+  const yearParam = c.req.query("year");
+  const year = yearParam ? Number(yearParam) : null;
+  if (year !== null && (!Number.isInteger(year) || year < 2009 || year > 2100)) {
+    return c.json({ error: "invalid year" }, 400);
+  }
+
+  const userAliases = await db.select({ id: aliases.id }).from(aliases).where(eq(aliases.userId, userId));
+  if (userAliases.length === 0) {
+    return new Response(headerLine(), { status: 200, headers: csvHeaders(year, 0) });
+  }
+  const aliasIds = userAliases.map((a) => a.id);
+  const userMessageIds = await db
+    .select({ id: messages.id })
+    .from(messages)
+    .where(inArray(messages.aliasId, aliasIds));
+  if (userMessageIds.length === 0) {
+    return new Response(headerLine(), { status: 200, headers: csvHeaders(year, 0) });
+  }
+  const messageIds = userMessageIds.map((m) => m.id);
+
+  const filters = [inArray(receipts.messageId, messageIds)];
+  if (year !== null) {
+    const start = new Date(Date.UTC(year, 0, 1));
+    const end = new Date(Date.UTC(year + 1, 0, 1));
+    filters.push(gte(receipts.occurredAt, start));
+    filters.push(lt(receipts.occurredAt, end));
+  }
+  const baseFilter = filters.length === 1 ? filters[0] : and(...filters);
+
+  const rows = await db
+    .select({
+      occurredAt: receipts.occurredAt,
+      source: receipts.source,
+      type: receipts.type,
+      chain: receipts.chain,
+      asset: receipts.asset,
+      amount: receipts.amount,
+      assetPriceUsd: receipts.assetPriceUsd,
+      txHash: receipts.txHash,
+      counterparty: receipts.counterparty,
+      status: receipts.status,
+      raw: receipts.raw,
+    })
+    .from(receipts)
+    .where(baseFilter)
+    .orderBy(desc(receipts.occurredAt))
+    .limit(10000);
+
+  const body = headerLine() + rows.map(receiptRow).join("");
+  return new Response(body, { status: 200, headers: csvHeaders(year, rows.length) });
+});
+
+function headerLine(): string {
+  return [
+    "date",
+    "source",
+    "type",
+    "chain",
+    "asset",
+    "amount",
+    "price_usd",
+    "fiat",
+    "fiat_amount",
+    "tx_hash",
+    "counterparty",
+    "status",
+  ].join(",") + "\n";
+}
+
+function csvHeaders(year: number | null, count: number): Record<string, string> {
+  const filename =
+    "chainmail-receipts" + (year ? `-${year}` : "") + `.csv`;
+  return {
+    "content-type": "text/csv; charset=utf-8",
+    "content-disposition": `attachment; filename="${filename}"`,
+    "x-row-count": String(count),
+  };
+}
+
+function csvField(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  const s = String(v);
+  if (s.includes(",") || s.includes('"') || s.includes("\n") || s.includes("\r")) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function receiptRow(r: {
+  occurredAt: Date | null;
+  source: string;
+  type: string;
+  chain: string | null;
+  asset: string | null;
+  amount: string | number | null;
+  assetPriceUsd: string | number | null;
+  txHash: string | null;
+  counterparty: string | null;
+  status: string;
+  raw: Record<string, unknown> | null;
+}): string {
+  const raw = (r.raw ?? {}) as Record<string, unknown>;
+  const fiat = typeof raw.fiat === "string" ? raw.fiat : "";
+  const fiatAmount =
+    typeof raw.fiatAmount === "string" || typeof raw.fiatAmount === "number"
+      ? raw.fiatAmount
+      : "";
+  return [
+    r.occurredAt ? r.occurredAt.toISOString() : "",
+    r.source,
+    r.type,
+    r.chain ?? "",
+    r.asset ?? "",
+    r.amount ?? "",
+    r.assetPriceUsd ?? "",
+    fiat,
+    fiatAmount,
+    r.txHash ?? "",
+    r.counterparty ?? "",
+    r.status,
+  ]
+    .map(csvField)
+    .join(",") + "\n";
+}
 
 export const messagesRoute = route;

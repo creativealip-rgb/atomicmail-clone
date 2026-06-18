@@ -35,8 +35,42 @@ export function MessageView({ messageId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [decryptedBody, setDecryptedBody] = useState<string | null>(null);
   const [decrypting, setDecrypting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const userId = useSelector((s: RootState) => s.auth.user?.id);
   const demoMode = useSelector((s: RootState) => s.auth.demoMode);
+
+  async function handleExportCsv() {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const token = localStorage.getItem("chainmail.access");
+      const year = new Date().getFullYear();
+      const url = `${apiUrl}/api/receipts/export.csv?year=${year}`;
+      const res = await fetch(url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        alert(`Export failed: HTTP ${res.status}`);
+        return;
+      }
+      const blob = await res.blob();
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = dlUrl;
+      const dispo = res.headers.get("content-disposition") ?? "";
+      const match = /filename="?([^"]+)"?/.exec(dispo);
+      a.download = match?.[1] ?? `chainmail-receipts-${year}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(dlUrl), 1000);
+    } catch (err) {
+      alert(`Export failed: ${err instanceof Error ? err.message : "unknown"}`);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   // Fetch message + receipt
   useEffect(() => {
@@ -202,7 +236,14 @@ export function MessageView({ messageId }: Props) {
         <button className={styles.iconBtn} title="Star">☆</button>
         <LabelPicker messageId={msg.id} />
         <span className={styles.spacer} />
-        <button className={styles.iconBtn} title="Export as CSV">📊 Export CSV</button>
+        <button
+          className={styles.iconBtn}
+          title="Export all your receipts as CSV"
+          onClick={handleExportCsv}
+          disabled={exporting}
+        >
+          {exporting ? "⏳ Exporting…" : "📊 Export CSV"}
+        </button>
       </nav>
 
       <div className={styles.body}>
