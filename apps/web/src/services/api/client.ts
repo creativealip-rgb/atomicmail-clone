@@ -9,7 +9,7 @@ import {
 } from "@/services/demo/seed";
 import type { Message, Folder, User, Alias } from "@ui/shared-types";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "https://api.atomicmail.io";
+const API_URL = import.meta.env.VITE_API_URL ?? "https://api.chainmail.app";
 const IS_DEMO = import.meta.env.VITE_DEMO === "true";
 
 /**

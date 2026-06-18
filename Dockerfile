@@ -1,4 +1,4 @@
-# Multi-stage build for Atomic Mail Clone (static React SPA)
+# Multi-stage build for Chainmail (static React SPA)
 FROM node:22-alpine AS builder
 
 WORKDIR /app

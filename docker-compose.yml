@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: atomicmail-clone:latest
-    container_name: atomicmail-clone
+    image: chainmail:latest
+    container_name: chainmail
     restart: unless-stopped
     networks:
       - dokploy-network

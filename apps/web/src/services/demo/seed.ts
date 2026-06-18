@@ -1,5 +1,5 @@
 // Demo seed data — used when VITE_DEMO=true to render the dashboard
-// without needing real atomicmail.io auth. Same Message shape as the
+// without needing real chainmail.app auth. Same Message shape as the
 // production API so all UI logic works identically.
 
 import type {
@@ -19,7 +19,7 @@ const baseDate = (offsetMin: number) =>
 
 export const DEMO_USER: User = {
   id: "usr_demo_alip",
-  email: "alip@atomicmail-clone.demo",
+  email: "alip@chainmail.demo",
   displayName: "Alip",
   plan: "plus",
   publicKey: "MCowBQYDK2VwAyEAR9Y5K0o9bzG8c5Xm+KQ4VuJqq2lY4CkQkg==",
@@ -66,9 +66,9 @@ export const DEMO_FOLDERS: Folder[] = [
 export const DEMO_INBOX: Message[] = [
   {
     id: "msg_001",
-    from: "security@atomicmail.io",
-    fromName: "Security Atomic Mail",
-    to: ["alip@atomicmail-clone.demo"],
+    from: "security@chainmail.app",
+    fromName: "Chainmail Security",
+    to: ["alip@chainmail.demo"],
     subject: "Did you log in from a new device?",
     preview:
       "We noticed a sign-in to your account from a new device (Jakarta, ID). If this was you, no action is needed. If not, secure your account…",
@@ -83,10 +83,10 @@ export const DEMO_INBOX: Message[] = [
   },
   {
     id: "msg_002",
-    from: "community@atomicmail.io",
-    fromName: "Community Atomic Mail",
-    to: ["alip@atomicmail-clone.demo"],
-    subject: "Join Atomic Mail Community on Discord! 💬",
+    from: "community@chainmail.app",
+    fromName: "Chainmail Community",
+    to: ["alip@chainmail.demo"],
+    subject: "Join Chainmail Community on Discord! 💬",
     preview:
       "Hey there! We've just opened our official Discord server — a place to discuss features, share feedback, and meet other privacy-minded users…",
     receivedAt: baseDate(64),
@@ -100,10 +100,10 @@ export const DEMO_INBOX: Message[] = [
   },
   {
     id: "msg_003",
-    from: "product@atomicmail.io",
-    fromName: "Product Atomic Mail",
-    to: ["alip@atomicmail-clone.demo"],
-    subject: "Welcome to Atomic Mail! 🚀",
+    from: "product@chainmail.app",
+    fromName: "Chainmail Product",
+    to: ["alip@chainmail.demo"],
+    subject: "Welcome to Chainmail! 🚀",
     preview:
       "Your account is ready. Here are 3 things you can do right now: 1) Set up 2FA in Privacy Center  2) Create your first Hide-My-Email alias  3) Try encrypted email…",
     receivedAt: baseDate(180),
@@ -119,7 +119,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_004",
     from: "billing@stripe.com",
     fromName: "Stripe",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "Your invoice for June 2026 is ready",
     preview:
       "Invoice INV-2026-06-0042 for $19.00 is now available. View PDF, update payment method, or download for your records…",
@@ -144,8 +144,8 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_005",
     from: "github@noreply.github.com",
     fromName: "GitHub",
-    to: ["alip@atomicmail-clone.demo"],
-    subject: "[atomicmail-clone] PR #14 ready for review",
+    to: ["alip@chainmail.demo"],
+    subject: "[chainmail] PR #14 ready for review",
     preview:
       "coder-2 opened pull request feat/inbox-demo: adds VITE_DEMO flag to render dashboard with seed data. 3 files changed, 142 insertions(+)…",
     receivedAt: baseDate(720),
@@ -161,7 +161,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_006",
     from: "newsletter@figma.com",
     fromName: "Figma Weekly",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "5 fresh design systems to study this week",
     preview:
       "This week we're featuring Linear, Vercel, Stripe, Raycast, and Cron. All open source, all beautiful. Plus a deep-dive on design tokens…",
@@ -178,8 +178,8 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_007",
     from: "notifications@docker.com",
     fromName: "Docker Hub",
-    to: ["alip@atomicmail-clone.demo"],
-    subject: "Your image atomicmail-clone:latest was built",
+    to: ["alip@chainmail.demo"],
+    subject: "Your image chainmail:latest was built",
     preview:
       "Build completed in 11.27s. Image size: 76.4 MB. Pushed to registry. View build logs and security scan results in the dashboard…",
     receivedAt: baseDate(2_160),
@@ -195,8 +195,8 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_008",
     from: "team@vercel.com",
     fromName: "Vercel",
-    to: ["alip@atomicmail-clone.demo"],
-    subject: "Deployment successful: atomicmail-clone.vercel.app",
+    to: ["alip@chainmail.demo"],
+    subject: "Deployment successful: chainmail.vercel.app",
     preview:
       "Your deployment completed in 23s. Build size: 280 KB. All 12 routes responding 200. View deployment details and metrics…",
     receivedAt: baseDate(2_880),
@@ -212,7 +212,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_009",
     from: "Mimi Amilia <mimi@vai.id>",
     fromName: "Mimi Amilia",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "Re: VAI website — invoice attached",
     preview:
       "Thanks for the quick turnaround! Invoice looks good. One small note — can you add the Cormorant Garamond font to the typography spec? Cheers…",
@@ -237,7 +237,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_010",
     from: "alerts@uptimerobot.com",
     fromName: "UptimeRobot",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "✅ All monitors UP — premiacc.168-144-37-19.sslip.io",
     preview:
       "All 5 monitors are responding normally. Uptime this month: 99.97%. Average response time: 187ms. View full report…",
@@ -254,7 +254,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_011",
     from: "noreply@midtrans.com",
     fromName: "Midtrans",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "Payment received — Order #ORD-2026-06-0042",
     preview:
       "We've successfully received your payment of Rp 250.000 for order ORD-2026-06-0042. Customer: via-public@premiacc.test. Settlement in 1-2 business days…",
@@ -271,7 +271,7 @@ export const DEMO_INBOX: Message[] = [
     id: "msg_012",
     from: "ronaldo@premiacc.test",
     fromName: "Ronaldo",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "Re: stok ChatGPT Plus ready?",
     preview:
       "Bro gue mau 3 akun ChatGPT Plus, bisa ready hari ini? Bayar pake BCA. Kalau bisa gue transfer sekarang…",
@@ -291,7 +291,7 @@ export const DEMO_INBOX: Message[] = [
 export const DEMO_SENT: Message[] = [
   {
     id: "msg_s01",
-    from: "alip@atomicmail-clone.demo",
+    from: "alip@chainmail.demo",
     fromName: "Alip",
     to: ["team@vai.id"],
     subject: "Re: VAI website redesign — Phase 2 done",
@@ -308,7 +308,7 @@ export const DEMO_SENT: Message[] = [
   },
   {
     id: "msg_s02",
-    from: "alip@atomicmail-clone.demo",
+    from: "alip@chainmail.demo",
     fromName: "Alip",
     to: ["ronaldo@premiacc.test"],
     subject: "Re: stok ChatGPT Plus ready?",
@@ -330,7 +330,7 @@ export const DEMO_SENT: Message[] = [
 export const DEMO_DRAFTS: Message[] = [
   {
     id: "msg_d01",
-    from: "alip@atomicmail-clone.demo",
+    from: "alip@chainmail.demo",
     fromName: "Alip",
     to: ["investor@yc.com"],
     subject: "PremiAcc — seed round intro",
@@ -355,7 +355,7 @@ export const DEMO_DRAFTS: Message[] = [
   },
   {
     id: "msg_d02",
-    from: "alip@atomicmail-clone.demo",
+    from: "alip@chainmail.demo",
     fromName: "Alip",
     to: ["ops@digitalocean.com"],
     subject: "Upgrade droplet s-2vcpu-8gb → s-4vcpu-16gb",
@@ -379,7 +379,7 @@ export const DEMO_JUNK: Message[] = [
     id: "msg_j01",
     from: "lottery@winner-nigeria.tk",
     fromName: "INHERITANCE CLAIMS",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "🎉 CONGRATULATIONS — You won $4,500,000 USD 🎉",
     preview:
       "DEAR WINNER, Your email has been selected in our annual international lottery. Send your full name, address, bank details, and a processing fee of $250…",
@@ -396,7 +396,7 @@ export const DEMO_JUNK: Message[] = [
     id: "msg_j02",
     from: "no-reply@crypto-elon-airdrop.io",
     fromName: "ElonCoin Airdrop",
-    to: ["alip@atomicmail-clone.demo"],
+    to: ["alip@chainmail.demo"],
     subject: "Claim 5000 ELON — 24 hours left!",
     preview:
       "Limited airdrop! Connect your wallet now to claim 5000 ELON tokens (worth $899 USD). Hurry — only 47 spots left for your region…",
@@ -416,34 +416,34 @@ export const DEMO_JUNK: Message[] = [
 export const DEMO_ALIASES: Alias[] = [
   {
     id: "als_01",
-    email: "alip.shop@atomicmail-clone.demo",
+    email: "alip.shop@chainmail.demo",
     createdAt: "2026-03-10T08:00:00.000Z",
     active: true,
-    forwardTo: "alip@atomicmail-clone.demo",
+    forwardTo: "alip@chainmail.demo",
     description: "Online shopping signups",
   },
   {
     id: "als_02",
-    email: "alip.newsletter@atomicmail-clone.demo",
+    email: "alip.newsletter@chainmail.demo",
     createdAt: "2026-04-22T08:00:00.000Z",
     active: true,
-    forwardTo: "alip@atomicmail-clone.demo",
+    forwardTo: "alip@chainmail.demo",
     description: "Newsletter subscriptions",
   },
   {
     id: "als_03",
-    email: "alip.discord@atomicmail-clone.demo",
+    email: "alip.discord@chainmail.demo",
     createdAt: "2026-05-01T08:00:00.000Z",
     active: true,
-    forwardTo: "alip@atomicmail-clone.demo",
+    forwardTo: "alip@chainmail.demo",
     description: "Discord registrations",
   },
   {
     id: "als_04",
-    email: "alip.deleted@atomicmail-clone.demo",
+    email: "alip.deleted@chainmail.demo",
     createdAt: "2026-02-14T08:00:00.000Z",
     active: false,
-    forwardTo: "alip@atomicmail-clone.demo",
+    forwardTo: "alip@chainmail.demo",
     description: "Deactivated 2026-03-01",
   },
 ];

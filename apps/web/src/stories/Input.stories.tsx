@@ -11,7 +11,7 @@ export default meta;
 type Story = StoryObj<typeof Input>;
 
 export const Default: Story = {
-  args: { label: "Email", placeholder: "you@atomicmail.io" },
+  args: { label: "Email", placeholder: "you@chainmail.app" },
 };
 export const WithHelper: Story = {
   args: { label: "Password", type: "password", helper: "Use at least 8 characters" },
@@ -20,5 +20,5 @@ export const WithError: Story = {
   args: { label: "Email", defaultValue: "invalid", error: "Must be a valid email address" },
 };
 export const Disabled: Story = {
-  args: { label: "Email", disabled: true, defaultValue: "locked@atomicmail.io" },
+  args: { label: "Email", disabled: true, defaultValue: "locked@chainmail.app" },
 };

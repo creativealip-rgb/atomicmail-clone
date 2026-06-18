@@ -46,7 +46,7 @@ export function DesignSystem() {
     <section id="design">
       <header className={styles.header}>
         <h2>Design system</h2>
-        <p>Extracted from atomicmail.io via DOM inspection + bundle analysis. Reusable tokens & components.</p>
+        <p>Chainmail design tokens. Inspired by atomicmail.io's design system + independent brand decisions.</p>
       </header>
 
       <div className={styles.grid}>

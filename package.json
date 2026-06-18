@@ -1,8 +1,8 @@
 {
-  "name": "atomicmail-clone",
+  "name": "chainmail",
   "private": true,
-  "version": "0.0.0",
-  "description": "E2E encrypted email client — clone project for Atomic Mail",
+  "version": "0.1.0",
+  "description": "E2E encrypted email client — Chainmail (second inbox for on-chain receipts)",
   "scripts": {
     "dev": "pnpm --filter web dev",
     "build": "pnpm -r build",

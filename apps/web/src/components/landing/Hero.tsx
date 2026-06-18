@@ -18,7 +18,7 @@ export function Hero() {
       </h1>
 
       <p className={styles.subtitle}>
-        A reverse-engineered clone of Atomic Mail's web client — E2E encryption,
+        Your on-chain receipts. Encrypted. Searchable. Tax-ready.
         zero-access storage, modern React + Vite stack. Built for learning and
         self-hosting.
       </p>
@@ -28,7 +28,7 @@ export function Hero() {
           <Button size="lg">Try the app →</Button>
         </Link>
         <a
-          href="https://github.com/creativealip-rgb/atomicmail-clone"
+          href="https://github.com/creativealip-rgb/chainmail"
           target="_blank"
           rel="noreferrer"
         >
@@ -42,7 +42,7 @@ export function Hero() {
             <span className={styles.dotR} />
             <span className={styles.dotY} />
             <span className={styles.dotG} />
-            <span className={styles.url}>atomicmail-clone.168-144-37-19.sslip.io/app</span>
+            <span className={styles.url}>chainmail.168-144-37-19.sslip.io/app</span>
           </div>
           <div className={styles.windowBody}>
             <div className={styles.miniSidebar}>
@@ -60,7 +60,7 @@ export function Hero() {
               <div className={styles.miniRow} data-unread="true">
                 <span className={styles.miniAvatar} style={{ background: "linear-gradient(135deg,#C091FF,#8A8FFB)" }}>S</span>
                 <div>
-                  <div className={styles.miniSender}>Security Atomic Mail</div>
+                  <div className={styles.miniSender}>Chainmail Security</div>
                   <div className={styles.miniSubject}>Did you log in from a new device?</div>
                 </div>
                 <div className={styles.miniTime}>16:01</div>
@@ -68,16 +68,16 @@ export function Hero() {
               <div className={styles.miniRow}>
                 <span className={styles.miniAvatar} style={{ background: "linear-gradient(135deg,#7DCFFF,#067DF7)" }}>C</span>
                 <div>
-                  <div className={styles.miniSender}>Community Atomic Mail</div>
-                  <div className={styles.miniSubject}>Join Atomic Mail Community on Discord! 💬</div>
+                  <div className={styles.miniSender}>Chainmail Community</div>
+                  <div className={styles.miniSubject}>Join Chainmail Community on Discord! 💬</div>
                 </div>
                 <div className={styles.miniTime}>11.04</div>
               </div>
               <div className={styles.miniRow}>
                 <span className={styles.miniAvatar} style={{ background: "linear-gradient(135deg,#FF98F0,#C091FF)" }}>P</span>
                 <div>
-                  <div className={styles.miniSender}>Product Atomic Mail</div>
-                  <div className={styles.miniSubject}>Welcome to Atomic Mail! 🚀</div>
+                  <div className={styles.miniSender}>Chainmail Product</div>
+                  <div className={styles.miniSubject}>Welcome to Chainmail! 🚀</div>
                 </div>
                 <div className={styles.miniTime}>11.04</div>
               </div>

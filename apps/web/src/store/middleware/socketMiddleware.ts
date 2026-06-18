@@ -7,7 +7,7 @@ import { setMessages, appendMessage } from "@/store/slices/messagesSlice";
 import { setUnread as setFolderUnread } from "@/store/slices/foldersSlice";
 import { push } from "@/store/slices/notificationsSlice";
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? "wss://ws.atomicmail.io";
+const WS_URL = import.meta.env.VITE_WS_URL ?? "wss://ws.chainmail.app";
 
 let socket: Socket | null = null;
 

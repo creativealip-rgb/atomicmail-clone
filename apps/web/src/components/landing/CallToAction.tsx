@@ -15,7 +15,7 @@ export function CallToAction() {
           <Button size="lg">Try the app →</Button>
         </Link>
         <a
-          href="https://github.com/creativealip-rgb/atomicmail-clone"
+          href="https://github.com/creativealip-rgb/chainmail"
           target="_blank"
           rel="noreferrer"
         >

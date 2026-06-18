@@ -6,7 +6,7 @@ const LAYERS = [
   { name: "Crypto", tech: "WebCrypto + @noble", detail: "AES-GCM · Ed25519 · secp256k1" },
   { name: "Storage", tech: "localforage → IndexedDB", detail: "encrypted message cache" },
   { name: "Realtime", tech: "Socket.IO", detail: "message:new · folder:unread" },
-  { name: "API", tech: "ky + REST", detail: "api.atomicmail.io" },
+  { name: "API", tech: "ky + REST", detail: "api.chainmail.app" },
   { name: "Server", tech: "Postgres (implied)", detail: "encrypted blobs + pubkey dir" },
 ];
 

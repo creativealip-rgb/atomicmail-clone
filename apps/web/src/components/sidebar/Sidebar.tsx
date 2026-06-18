@@ -15,7 +15,7 @@ export function Sidebar() {
     <aside className={styles.sidebar} aria-label="Primary navigation">
       <Link to="/" className={styles.logo}>
         <span className={styles.logoMark}>⚛</span>
-        <span className={styles.logoText}>Atomic Mail</span>
+        <span className={styles.logoText}>Chainmail</span>
         <span className={styles.beta}>beta</span>
       </Link>
 

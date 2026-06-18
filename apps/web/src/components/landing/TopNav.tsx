@@ -7,7 +7,7 @@ export function TopNav() {
     <header className={styles.nav}>
       <Link to="/" className={styles.brand}>
         <Logo size={32} />
-        <span className={styles.brandText}>Atomic Mail Clone</span>
+        <span className={styles.brandText}>Chainmail</span>
         <span className={styles.beta}>demo</span>
       </Link>
 
@@ -17,7 +17,7 @@ export function TopNav() {
         <a href="#design">Design system</a>
         <a href="#architecture">Architecture</a>
         <a
-          href="https://github.com/creativealip-rgb/atomicmail-clone"
+          href="https://github.com/creativealip-rgb/chainmail"
           target="_blank"
           rel="noreferrer"
         >

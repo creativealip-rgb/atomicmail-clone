@@ -1,6 +1,6 @@
 import { io, type Socket } from "socket.io-client";
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? "wss://ws.atomicmail.io";
+const WS_URL = import.meta.env.VITE_WS_URL ?? "wss://ws.chainmail.app";
 
 let socket: Socket | null = null;
 

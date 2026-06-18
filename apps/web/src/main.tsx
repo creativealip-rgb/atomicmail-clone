@@ -12,7 +12,7 @@ import "@/styles/tokens.css";
 import "@/styles/globals.css";
 
 // Demo mode: bootstrap auth + folders so the dashboard is fully populated
-// without ever calling the real atomicmail.io API.
+// without ever calling the real chainmail.app API.
 if (isDemoMode()) {
   store.dispatch(
     signInSuccess({ email: DEMO_USER.email, token: "demo-token" })
