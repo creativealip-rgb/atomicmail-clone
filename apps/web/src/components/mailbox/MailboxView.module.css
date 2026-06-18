@@ -1,5 +1,26 @@
 .view { display: flex; flex-direction: column; flex: 1; }
 
+.viewHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-2);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.viewTitle {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  color: var(--color-neutral-900);
+  text-transform: capitalize;
+}
+.viewCount {
+  font-size: var(--fs-sm);
+  color: var(--color-neutral-500);
+  font-weight: var(--fw-medium);
+}
+
 .toolbar {
   display: flex;
   align-items: center;

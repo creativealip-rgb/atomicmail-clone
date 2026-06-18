@@ -1,5 +1,8 @@
 import type { ApiMessage } from "@/store/slices/messagesSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useNavigate } from "react-router-dom";
+import { moveMessage, setMessageLabels, fetchMessageDetail } from "@/store/slices/messagesSlice";
+import { decrementUnread } from "@/store/slices/foldersSlice";
 import styles from "./MessageList.module.css";
 
 interface Props {
@@ -26,21 +29,47 @@ function timeAgo(iso: string): string {
 
 export function MessageList({ messages }: Props) {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const activeFolder = useAppSelector((s) => s.messages.activeFolder);
+  const labels = useAppSelector((s) => s.folders.labels);
+  const labelsByMessage = useAppSelector((s) => s.messages.labelsByMessage);
+
+  const handleOpen = (m: ApiMessage) => {
+    if (!m.readAt) {
+      // Decrement unread in current folder
+      dispatch(decrementUnread(activeFolder));
+    }
+    navigate(`/app/mailbox/${activeFolder}/message/${m.id}`);
+  };
+
+  const handleAction = (e: React.MouseEvent, action: "trash" | "archive" | "spam" | "star", m: ApiMessage) => {
+    e.stopPropagation();
+    if (action === "star") {
+      // For v1: star = move to a virtual folder. We'll just toggle by moving to 'flagged' (which we'll wire later).
+      // For now: keep simple — just update labels as a workaround. Skip star until proper toggle.
+      return;
+    }
+    if (action === "trash") dispatch(moveMessage({ id: m.id, folder: "trash" }));
+    if (action === "archive") dispatch(moveMessage({ id: m.id, folder: "archive" }));
+    if (action === "spam") dispatch(moveMessage({ id: m.id, folder: "junk" }));
+  };
+
   return (
     <ul className={styles.list}>
       {messages.map((m) => {
         const badge = m.parserKey ? PARSER_BADGE[m.parserKey] : null;
+        const msgLabels = labelsByMessage[m.id] ?? [];
         return (
           <li
             key={m.id}
-            className={styles.row}
-            onClick={() => navigate(`/app/mailbox/inbox/message/${m.id}`)}
+            className={m.readAt ? styles.row : `${styles.row} ${styles.rowUnread}`}
+            onClick={() => handleOpen(m)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                navigate(`/app/mailbox/inbox/message/${m.id}`);
+                handleOpen(m);
               }
             }}
           >
@@ -63,12 +92,44 @@ export function MessageList({ messages }: Props) {
               <div className={styles.from}>
                 {m.fromName ?? m.fromAddr} → <span className={styles.alias}>{m.aliasEmail}</span>
               </div>
+              {msgLabels.length > 0 && (
+                <div className={styles.labels}>
+                  {msgLabels.map((l) => (
+                    <span key={l.id} className={styles.labelChip} style={{ background: l.color }}>
+                      {l.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className={styles.right}>
               <time className={styles.time} dateTime={m.receivedAt}>
                 {timeAgo(m.receivedAt)}
               </time>
-              {m.readAt === null && <span className={styles.unread} aria-label="Unread" />}
+              {!m.readAt && <span className={styles.unread} aria-label="Unread" />}
+              <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={styles.actionBtn}
+                  title="Archive"
+                  onClick={(e) => handleAction(e, "archive", m)}
+                >
+                  ⌫
+                </button>
+                <button
+                  className={styles.actionBtn}
+                  title="Spam"
+                  onClick={(e) => handleAction(e, "spam", m)}
+                >
+                  ⚑
+                </button>
+                <button
+                  className={styles.actionBtn}
+                  title="Trash"
+                  onClick={(e) => handleAction(e, "trash", m)}
+                >
+                  🗑
+                </button>
+              </div>
             </div>
           </li>
         );

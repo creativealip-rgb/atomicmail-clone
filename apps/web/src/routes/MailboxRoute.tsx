@@ -3,15 +3,22 @@ import { TopBar } from "@/components/topbar/TopBar";
 import { MailboxView } from "@/components/mailbox/MailboxView";
 import { useParams } from "react-router-dom";
 
-export default function MailboxRoute() {
-  const { mailbox } = useParams<{ mailbox: string }>();
+interface Props {
+  labelView?: boolean;
+}
+
+export default function MailboxRoute({ labelView }: Props) {
+  const params = useParams<{ mailbox?: string; labelId?: string }>();
+  // When labelView is true, treat as label filter; otherwise as folder
+  const folderId = labelView ? undefined : params.mailbox ?? "inbox";
+  const labelId = labelView ? params.labelId : undefined;
 
   return (
     <div className="dashboard-layout">
       <Sidebar />
       <div className="dashboard-main">
         <TopBar />
-        <MailboxView mailboxId={mailbox ?? "inbox"} />
+        <MailboxView mailboxId={folderId ?? "inbox"} labelId={labelId} />
       </div>
     </div>
   );

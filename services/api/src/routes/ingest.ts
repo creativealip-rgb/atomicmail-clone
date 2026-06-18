@@ -121,6 +121,7 @@ ingestRoute.post("/", async (c) => {
       bodyText: null,        // PII protection — only envelope stored
       bodyHtml: null,
       encryptedBody: encryptedJson,
+      folder: (email as any).folder ?? "inbox",
       messageIdHeader: email.messageIdHeader ?? null,
       receivedAt: email.receivedAt,
       parserKey: parsedReceipt?.parserKey ?? null,

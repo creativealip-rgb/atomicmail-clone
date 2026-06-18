@@ -20,6 +20,9 @@ export const messages = pgTable(
     // Encrypted body (AES-GCM ciphertext, base64). Plaintext never stored.
     // Nullable in W3 — populated when per-user keypair lands.
     encryptedBody: text("encrypted_body"),
+    // System folder slug: inbox | sent | drafts | trash | junk | archive | flagged | important
+    // "flagged" = starred, "important" = priority flag, both special system views
+    folder: text("folder").notNull().default("inbox"),
     // Parsed receipt (NULL if parser didn't match)
     receiptId: uuid("receipt_id"),
     // Set once parser matches a known sender (e.g. "coinbase", "binance", "etherscan")
@@ -34,5 +37,6 @@ export const messages = pgTable(
     aliasIdx: index("messages_alias_idx").on(t.aliasId),
     receivedIdx: index("messages_received_idx").on(t.receivedAt),
     parserIdx: index("messages_parser_idx").on(t.parserKey),
+    folderIdx: index("messages_folder_idx").on(t.folder),
   })
 );

@@ -90,3 +90,56 @@
   background: #2563eb;
   border-radius: 50%;
 }
+
+.rowUnread {
+  background: var(--bg-unread, #f0f7ff);
+  font-weight: 600;
+}
+.rowUnread .subject {
+  color: var(--color-text-strong, #000);
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.labelChip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.rowActions {
+  display: flex;
+  gap: 0.15rem;
+  opacity: 0;
+  transition: opacity 100ms;
+  margin-left: 0.5rem;
+}
+.row:hover .rowActions,
+.row:focus-within .rowActions { opacity: 1; }
+
+.actionBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm, 4px);
+  font-size: 14px;
+  background: transparent;
+  color: var(--color-text-muted, #5a5a5a);
+  transition: background 100ms;
+}
+.actionBtn:hover {
+  background: var(--bg-hover-strong, #e5e7eb);
+  color: var(--color-text, #0a0a0a);
+}

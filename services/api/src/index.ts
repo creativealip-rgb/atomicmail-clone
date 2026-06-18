@@ -11,6 +11,7 @@ import { auth } from "./routes/auth.js";
 import { aliases } from "./routes/aliases.js";
 import { ingestRoute } from "./routes/ingest.js";
 import { messagesRoute } from "./routes/messages.js";
+import { foldersRoute } from "./routes/folders.js";
 import { errorHandler } from "./middleware/error.js";
 import type { ChainmailVars } from "./middleware/auth.js";
 
@@ -33,6 +34,8 @@ app.route("/api/aliases", aliases);
 app.route("/api/ingest", ingestRoute);
 // messagesRoute now mounts both /api/messages and /api/receipts
 app.route("/api", messagesRoute);
+// foldersRoute mounts /api/folders, /api/labels, /api/messages/:id, /api/messages/:id/labels
+app.route("/api", foldersRoute);
 
 app.get("/", (c) => c.text("chainmail-api · see /api/health"));
 

@@ -15,6 +15,13 @@
       "when": 1781768197821,
       "tag": "0001_tough_smiling_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781789720913,
+      "tag": "0002_lazy_cannonball",
+      "breakpoints": true
     }
   ]
 }

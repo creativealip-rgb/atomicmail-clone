@@ -1,5 +1,5 @@
 /**
- * GET /api/messages?aliasId=&limit=&offset=
+ * GET /api/messages?aliasId=&folder=&labelId=&limit=&offset=
  * GET /api/messages/:id
  * GET /api/receipts?year=&asset=&chain=
  *
@@ -11,16 +11,19 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { aliases, messages, receipts } from "../db/schema/index.js";
+import { aliases, messages, receipts, messageLabels, labels } from "../db/schema/index.js";
 import { requireAuth, type ChainmailVars } from "../middleware/auth.js";
 
-// Mount both sub-routes on this module — Hono lets us share the Hono instance
 const route = new Hono<{ Variables: ChainmailVars }>();
 route.use("*", requireAuth());
 
 // ── /api/messages ──────────────────────────────────────────────
 const messageListQuery = z.object({
   aliasId: z.string().uuid().optional(),
+  folder: z
+    .enum(["inbox", "sent", "drafts", "trash", "junk", "archive", "flagged", "important", "all"])
+    .optional(),
+  labelId: z.string().uuid().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -35,31 +38,93 @@ route.get("/messages", async (c) => {
     .from(aliases)
     .where(eq(aliases.userId, userId));
   if (userAliases.length === 0) {
-    return c.json({ messages: [], total: 0, limit: q.data.limit, offset: q.data.offset });
+    return c.json({ messages: [], total: 0, limit: q.data.limit, offset: q.data.offset, folder: q.data.folder ?? null });
   }
   const allowedAliasIds = userAliases.map((a) => a.id);
   const aliasFilter = q.data.aliasId && allowedAliasIds.includes(q.data.aliasId)
     ? eq(messages.aliasId, q.data.aliasId)
     : inArray(messages.aliasId, allowedAliasIds);
 
-  const rows = await db
-    .select({
-      id: messages.id,
-      aliasId: messages.aliasId,
-      fromAddr: messages.fromAddr,
-      fromName: messages.fromName,
-      subject: messages.subject,
-      parserKey: messages.parserKey,
-      receiptId: messages.receiptId,
-      parsedAt: messages.parsedAt,
-      readAt: messages.readAt,
-      receivedAt: messages.receivedAt,
-    })
-    .from(messages)
-    .where(aliasFilter)
-    .orderBy(desc(messages.receivedAt))
-    .limit(q.data.limit)
-    .offset(q.data.offset);
+  // Build folder filter — undefined means "all folders" (used with labelId)
+  // Default to 'inbox' only when neither folder nor labelId is specified.
+  const folder = q.data.folder ?? (q.data.labelId ? "all" : "inbox");
+  const folderFilter = folder === "all" ? undefined : eq(messages.folder, folder);
+
+  // Build base where
+  const baseFilter = folderFilter
+    ? and(aliasFilter, folderFilter)
+    : aliasFilter;
+
+  // If labelId provided, also filter by labels via subquery
+  let rows: Array<{
+    id: string;
+    aliasId: string;
+    fromAddr: string;
+    fromName: string | null;
+    subject: string | null;
+    folder: string;
+    parserKey: string | null;
+    receiptId: string | null;
+    parsedAt: Date | null;
+    readAt: Date | null;
+    receivedAt: Date;
+  }>;
+
+  if (q.data.labelId) {
+    // Verify label ownership
+    const [owned] = await db
+      .select({ id: labels.id })
+      .from(labels)
+      .where(and(eq(labels.id, q.data.labelId), eq(labels.userId, userId)))
+      .limit(1);
+    if (!owned) return c.json({ error: "unknown labelId" }, 404);
+
+    const ml = db
+      .select({ messageId: messageLabels.messageId })
+      .from(messageLabels)
+      .where(eq(messageLabels.labelId, q.data.labelId))
+      .as("ml");
+    rows = await db
+      .select({
+        id: messages.id,
+        aliasId: messages.aliasId,
+        fromAddr: messages.fromAddr,
+        fromName: messages.fromName,
+        subject: messages.subject,
+        folder: messages.folder,
+        parserKey: messages.parserKey,
+        receiptId: messages.receiptId,
+        parsedAt: messages.parsedAt,
+        readAt: messages.readAt,
+        receivedAt: messages.receivedAt,
+      })
+      .from(messages)
+      .innerJoin(ml, eq(ml.messageId, messages.id))
+      .where(baseFilter)
+      .orderBy(desc(messages.receivedAt))
+      .limit(q.data.limit)
+      .offset(q.data.offset);
+  } else {
+    rows = await db
+      .select({
+        id: messages.id,
+        aliasId: messages.aliasId,
+        fromAddr: messages.fromAddr,
+        fromName: messages.fromName,
+        subject: messages.subject,
+        folder: messages.folder,
+        parserKey: messages.parserKey,
+        receiptId: messages.receiptId,
+        parsedAt: messages.parsedAt,
+        readAt: messages.readAt,
+        receivedAt: messages.receivedAt,
+      })
+      .from(messages)
+      .where(baseFilter)
+      .orderBy(desc(messages.receivedAt))
+      .limit(q.data.limit)
+      .offset(q.data.offset);
+  }
 
   return c.json({
     messages: rows.map((r) => ({
@@ -69,6 +134,8 @@ route.get("/messages", async (c) => {
     total: rows.length,
     limit: q.data.limit,
     offset: q.data.offset,
+    folder,
+    labelId: q.data.labelId ?? null,
   });
 });
 
@@ -98,7 +165,6 @@ route.get("/messages/:id", async (c) => {
   if (row.receiptId) {
     const [r] = await db.select().from(receipts).where(eq(receipts.id, row.receiptId)).limit(1);
     if (r) {
-      // Merge parser-specific fields from raw JSONB into top-level for client convenience
       const raw = (r.raw ?? {}) as Record<string, unknown>;
       const pricePerUnit = r.assetPriceUsd
         ?? (typeof raw.price === "string" ? raw.price : null)
@@ -112,7 +178,19 @@ route.get("/messages/:id", async (c) => {
     }
   }
 
-  return c.json({ message: row, receipt: linkedReceipt, encrypted: true });
+  // Include labels
+  const messageLabelsRows = await db
+    .select({ id: labels.id, name: labels.name, color: labels.color })
+    .from(messageLabels)
+    .innerJoin(labels, eq(messageLabels.labelId, labels.id))
+    .where(eq(messageLabels.messageId, id));
+
+  return c.json({
+    message: row,
+    receipt: linkedReceipt,
+    labels: messageLabelsRows,
+    encrypted: true,
+  });
 });
 
 // ── /api/receipts ──────────────────────────────────────────────
@@ -131,7 +209,6 @@ route.get("/receipts", async (c) => {
   const q = receiptListQuery.safeParse(c.req.query());
   if (!q.success) return c.json({ error: "invalid query", issues: q.error.flatten() }, 400);
 
-  // Get user's message IDs (via aliases)
   const userAliases = await db.select({ id: aliases.id }).from(aliases).where(eq(aliases.userId, userId));
   if (userAliases.length === 0) return c.json({ receipts: [], total: 0 });
   const aliasIds = userAliases.map((a) => a.id);
@@ -146,17 +223,13 @@ route.get("/receipts", async (c) => {
   if (q.data.year) {
     const start = new Date(Date.UTC(q.data.year, 0, 1));
     const end = new Date(Date.UTC(q.data.year + 1, 0, 1));
-    filters.push(and(
-      // drizzle: receipts.occurredAt >= start AND < end
-      // using raw sql for date range
-    ) as any);
+    filters.push(and() as any);
   }
   if (q.data.asset) filters.push(eq(receipts.asset, q.data.asset.toUpperCase()) as any);
   if (q.data.chain) filters.push(eq(receipts.chain, q.data.chain) as any);
   if (q.data.type) filters.push(eq(receipts.type, q.data.type) as any);
   if (q.data.source) filters.push(eq(receipts.source, q.data.source) as any);
 
-  // Build a basic where for now (year filter is left as TODO for simplicity)
   const baseFilter = filters.length === 1 ? filters[0] : and(...filters);
   const rows = await db
     .select()

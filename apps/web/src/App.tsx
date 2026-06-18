@@ -23,6 +23,7 @@ export function App() {
             <Routes>
               <Route path="auth/*" element={<AuthLayout />} />
               <Route path="mailbox/:mailbox" element={<MailboxRoute />} />
+              <Route path="label/:labelId" element={<MailboxRoute labelView />} />
               <Route path="mailbox/:mailbox/message/:id" element={<MessageRoute />} />
               <Route path="encrypted/:key" element={<EncryptedRoute />} />
               {/* W3.5: post-signup one-time recovery code display */}
