@@ -65,24 +65,40 @@ route.get("/folders", async (c) => {
     });
   }
 
-  // Count unread per folder
+  // Count unread per folder — for the special "flagged" view, count starred instead
   const rows = await db
     .select({
       folder: messages.folder,
+      starred: messages.starred,
       unread: sql<number>`COUNT(*) FILTER (WHERE ${messages.readAt} IS NULL)`,
       total: sql<number>`COUNT(*)`,
     })
     .from(messages)
     .where(inArray(messages.aliasId, aliasIds))
-    .groupBy(messages.folder);
+    .groupBy(messages.folder, messages.starred);
 
-  const byFolder = Object.fromEntries(rows.map((r) => [r.folder, r]));
+  // Aggregate by system folder id
+  const byFolder: Record<string, { unread: number; total: number }> = {};
+  for (const f of SYSTEM_FOLDERS) byFolder[f.id] = { unread: 0, total: 0 };
+
+  for (const r of rows) {
+    // Normal folder bucket
+    if (byFolder[r.folder]) {
+      byFolder[r.folder].unread += Number(r.unread);
+      byFolder[r.folder].total += Number(r.total);
+    }
+    // Starred messages also count toward the "flagged" system view
+    if (r.starred) {
+      byFolder.flagged.unread += Number(r.unread);
+      byFolder.flagged.total += Number(r.total);
+    }
+  }
 
   return c.json({
     folders: SYSTEM_FOLDERS.map((f) => ({
       ...f,
-      unreadCount: Number(byFolder[f.id]?.unread ?? 0),
-      totalCount: Number(byFolder[f.id]?.total ?? 0),
+      unreadCount: byFolder[f.id].unread,
+      totalCount: byFolder[f.id].total,
     })),
   });
 });
@@ -186,6 +202,7 @@ route.delete("/labels/:id", async (c) => {
 // ── PATCH /api/messages/:id ─────────────────────────────────────
 const patchMessageSchema = z.object({
   folder: z.enum(["inbox", "sent", "drafts", "trash", "junk", "archive", "flagged", "important"]).optional(),
+  starred: z.boolean().optional(),
 });
 
 route.patch("/messages/:id", async (c) => {
@@ -203,7 +220,7 @@ route.patch("/messages/:id", async (c) => {
   const aliasIds = await userAliasIds(userId);
   const allowed = new Set(aliasIds);
   const [existing] = await db
-    .select({ id: messages.id, aliasId: messages.aliasId, folder: messages.folder })
+    .select({ id: messages.id, aliasId: messages.aliasId, folder: messages.folder, starred: messages.starred })
     .from(messages)
     .where(eq(messages.id, id))
     .limit(1);
@@ -213,6 +230,7 @@ route.patch("/messages/:id", async (c) => {
 
   const updates: Record<string, unknown> = {};
   if (parsed.data.folder) updates.folder = parsed.data.folder;
+  if (typeof parsed.data.starred === "boolean") updates.starred = parsed.data.starred;
 
   if (Object.keys(updates).length === 0) {
     return c.json({ message: existing }, 200);
@@ -279,6 +297,53 @@ route.post("/messages/:id/labels", async (c) => {
   });
 
   return c.json({ ok: true, messageId, labelIds: parsed.data.labelIds });
+});
+
+// ── POST /api/messages/mark-all-read ───────────────────────────
+const markAllReadQuery = z.object({
+  folder: z
+    .enum(["inbox", "sent", "drafts", "trash", "junk", "archive", "flagged", "important", "all"])
+    .default("inbox"),
+  labelId: z.string().uuid().optional(),
+});
+
+route.post("/messages/mark-all-read", async (c) => {
+  const userId = c.get("userId");
+  const q = markAllReadQuery.safeParse(c.req.query());
+  if (!q.success) return c.json({ error: "invalid query", issues: q.error.flatten() }, 400);
+
+  const aliasIds = await userAliasIds(userId);
+  if (aliasIds.length === 0) return c.json({ ok: true, updated: 0 });
+
+  const conditions = [inArray(messages.aliasId, aliasIds), isNull(messages.readAt)];
+
+  if (q.data.labelId) {
+    // Verify label ownership
+    const [owned] = await db
+      .select({ id: labels.id })
+      .from(labels)
+      .where(and(eq(labels.id, q.data.labelId), eq(labels.userId, userId)))
+      .limit(1);
+    if (!owned) return c.json({ error: "unknown labelId" }, 404);
+    const ml = db
+      .select({ messageId: messageLabels.messageId })
+      .from(messageLabels)
+      .where(eq(messageLabels.labelId, q.data.labelId))
+      .as("ml");
+    conditions.push(inArray(messages.id, db.select({ id: ml.messageId }).from(ml)));
+  } else if (q.data.folder === "flagged") {
+    conditions.push(eq(messages.starred, true));
+  } else if (q.data.folder !== "all") {
+    conditions.push(eq(messages.folder, q.data.folder));
+  }
+
+  const result = await db
+    .update(messages)
+    .set({ readAt: new Date() })
+    .where(and(...conditions))
+    .returning({ id: messages.id });
+
+  return c.json({ ok: true, updated: result.length, folder: q.data.folder, labelId: q.data.labelId ?? null });
 });
 
 // ── GET /api/messages/:id/labels ────────────────────────────────

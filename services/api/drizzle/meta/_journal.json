@@ -22,6 +22,13 @@
       "when": 1781789720913,
       "tag": "0002_lazy_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781791263134,
+      "tag": "0003_serious_yellow_claw",
+      "breakpoints": true
     }
   ]
 }

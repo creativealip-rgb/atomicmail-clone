@@ -66,7 +66,11 @@ export function MailboxView({ mailboxId, labelId }: Props) {
         <h1 className={styles.viewTitle}>{viewTitle}</h1>
         <span className={styles.viewCount}>{list.length}</span>
       </div>
-      <ActionToolbar />
+      <ActionToolbar
+        activeFolder={activeFolder}
+        activeLabelId={activeLabelId}
+        unreadCount={list.filter((m) => !m.readAt).length}
+      />
       {list.length === 0 ? (
         <div className={styles.empty}>
           <p>No messages.</p>

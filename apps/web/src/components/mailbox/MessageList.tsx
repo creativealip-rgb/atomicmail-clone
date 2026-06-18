@@ -1,7 +1,7 @@
 import type { ApiMessage } from "@/store/slices/messagesSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useNavigate } from "react-router-dom";
-import { moveMessage, setMessageLabels, fetchMessageDetail } from "@/store/slices/messagesSlice";
+import { moveMessage, setMessageLabels, fetchMessageDetail, starMessage } from "@/store/slices/messagesSlice";
 import { decrementUnread } from "@/store/slices/foldersSlice";
 import styles from "./MessageList.module.css";
 
@@ -45,8 +45,7 @@ export function MessageList({ messages }: Props) {
   const handleAction = (e: React.MouseEvent, action: "trash" | "archive" | "spam" | "star", m: ApiMessage) => {
     e.stopPropagation();
     if (action === "star") {
-      // For v1: star = move to a virtual folder. We'll just toggle by moving to 'flagged' (which we'll wire later).
-      // For now: keep simple — just update labels as a workaround. Skip star until proper toggle.
+      dispatch(starMessage({ id: m.id, starred: !m.starred }));
       return;
     }
     if (action === "trash") dispatch(moveMessage({ id: m.id, folder: "trash" }));
@@ -108,6 +107,15 @@ export function MessageList({ messages }: Props) {
               </time>
               {!m.readAt && <span className={styles.unread} aria-label="Unread" />}
               <div className={styles.rowActions} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={m.starred ? `${styles.actionBtn} ${styles.starred}` : styles.actionBtn}
+                  title={m.starred ? "Unstar" : "Star"}
+                  onClick={(e) => handleAction(e, "star", m)}
+                  aria-label={m.starred ? "Unstar message" : "Star message"}
+                  aria-pressed={m.starred}
+                >
+                  {m.starred ? "★" : "☆"}
+                </button>
                 <button
                   className={styles.actionBtn}
                   title="Archive"

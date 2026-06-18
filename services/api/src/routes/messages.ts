@@ -24,6 +24,7 @@ const messageListQuery = z.object({
     .enum(["inbox", "sent", "drafts", "trash", "junk", "archive", "flagged", "important", "all"])
     .optional(),
   labelId: z.string().uuid().optional(),
+  starred: z.coerce.boolean().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -45,15 +46,26 @@ route.get("/messages", async (c) => {
     ? eq(messages.aliasId, q.data.aliasId)
     : inArray(messages.aliasId, allowedAliasIds);
 
-  // Build folder filter — undefined means "all folders" (used with labelId)
-  // Default to 'inbox' only when neither folder nor labelId is specified.
-  const folder = q.data.folder ?? (q.data.labelId ? "all" : "inbox");
-  const folderFilter = folder === "all" ? undefined : eq(messages.folder, folder);
+  // Build folder filter
+  // Default to 'inbox' when no folder, labelId, or starred filter is specified.
+  // Special "flagged" view = starred messages across all folders.
+  const folder = q.data.folder
+    ?? (q.data.labelId || q.data.starred ? "all" : "inbox");
 
-  // Build base where
-  const baseFilter = folderFilter
-    ? and(aliasFilter, folderFilter)
-    : aliasFilter;
+  // folder='flagged' is mapped to starred=true filter
+  const folderFilter =
+    folder === "all" ? undefined
+    : folder === "flagged" ? eq(messages.starred, true)
+    : eq(messages.folder, folder);
+
+  // Explicit starred filter overrides folder
+  const starredFilter = typeof q.data.starred === "boolean" ? eq(messages.starred, q.data.starred) : undefined;
+
+  // Build base where (alias + folder + starred)
+  const baseConditions = [aliasFilter];
+  if (folderFilter) baseConditions.push(folderFilter);
+  if (starredFilter) baseConditions.push(starredFilter);
+  const baseFilter = baseConditions.length === 1 ? baseConditions[0] : and(...baseConditions);
 
   // If labelId provided, also filter by labels via subquery
   let rows: Array<{
@@ -63,6 +75,7 @@ route.get("/messages", async (c) => {
     fromName: string | null;
     subject: string | null;
     folder: string;
+    starred: boolean;
     parserKey: string | null;
     receiptId: string | null;
     parsedAt: Date | null;
@@ -92,6 +105,7 @@ route.get("/messages", async (c) => {
         fromName: messages.fromName,
         subject: messages.subject,
         folder: messages.folder,
+        starred: messages.starred,
         parserKey: messages.parserKey,
         receiptId: messages.receiptId,
         parsedAt: messages.parsedAt,
@@ -113,6 +127,7 @@ route.get("/messages", async (c) => {
         fromName: messages.fromName,
         subject: messages.subject,
         folder: messages.folder,
+        starred: messages.starred,
         parserKey: messages.parserKey,
         receiptId: messages.receiptId,
         parsedAt: messages.parsedAt,

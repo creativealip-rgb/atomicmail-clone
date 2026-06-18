@@ -23,6 +23,8 @@ export const messages = pgTable(
     // System folder slug: inbox | sent | drafts | trash | junk | archive | flagged | important
     // "flagged" = starred, "important" = priority flag, both special system views
     folder: text("folder").notNull().default("inbox"),
+    // Starred flag (independent of folder — a message can be starred in any folder)
+    starred: boolean("starred").notNull().default(false),
     // Parsed receipt (NULL if parser didn't match)
     receiptId: uuid("receipt_id"),
     // Set once parser matches a known sender (e.g. "coinbase", "binance", "etherscan")
@@ -38,5 +40,6 @@ export const messages = pgTable(
     receivedIdx: index("messages_received_idx").on(t.receivedAt),
     parserIdx: index("messages_parser_idx").on(t.parserKey),
     folderIdx: index("messages_folder_idx").on(t.folder),
+    starredIdx: index("messages_starred_idx").on(t.starred),
   })
 );

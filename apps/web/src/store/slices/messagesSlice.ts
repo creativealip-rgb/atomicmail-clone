@@ -8,6 +8,7 @@ export interface ApiMessage {
   fromName: string | null;
   subject: string | null;
   folder: string;
+  starred: boolean;
   parserKey: string | null;
   receiptId: string | null;
   parsedAt: string | null;
@@ -126,6 +127,42 @@ export const moveMessage = createAsyncThunk<
   return { id, folder };
 });
 
+/** Toggle the starred flag on a message */
+export const starMessage = createAsyncThunk<
+  { id: string; starred: boolean },
+  { id: string; starred: boolean },
+  { rejectValue: string }
+>("messages/star", async ({ id, starred }, { rejectWithValue }) => {
+  const token = getToken();
+  if (!token) return rejectWithValue("not authenticated");
+  const res = await fetch(import.meta.env.VITE_API_URL + `/api/messages/${id}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ starred }),
+  });
+  if (!res.ok) return rejectWithValue(`star failed (${res.status})`);
+  return { id, starred };
+});
+
+/** Mark all messages in a folder (or label) as read */
+export const markAllRead = createAsyncThunk<
+  { updated: number; folder: string; labelId: string | null },
+  { folder?: string; labelId?: string } | void,
+  { rejectValue: string }
+>("messages/markAllRead", async (params, { rejectWithValue }) => {
+  const token = getToken();
+  if (!token) return rejectWithValue("not authenticated");
+  const url = new URL("/api/messages/mark-all-read", window.location.origin);
+  if (params && "folder" in params && params.folder) url.searchParams.set("folder", params.folder);
+  if (params && "labelId" in params && params.labelId) url.searchParams.set("labelId", params.labelId);
+  const res = await fetch(import.meta.env.VITE_API_URL + url.pathname + url.search, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return rejectWithValue(`mark-all-read failed (${res.status})`);
+  return (await res.json()) as { updated: number; folder: string; labelId: string | null };
+});
+
 /** Set labels on a message (replaces existing assignments) */
 export const setMessageLabels = createAsyncThunk<
   { id: string; labelIds: string[] },
@@ -179,6 +216,20 @@ const messagesSlice = createSlice({
       .addCase(moveMessage.fulfilled, (s, a) => {
         // Remove the message from the current list (it moved away)
         s.list = s.list.filter((m) => m.id !== a.payload.id);
+      })
+      .addCase(starMessage.fulfilled, (s, a) => {
+        // Update the message in place
+        const idx = s.list.findIndex((m) => m.id === a.payload.id);
+        if (idx >= 0) {
+          const m = s.list[idx];
+          if (m) m.starred = a.payload.starred;
+        }
+      })
+      .addCase(markAllRead.fulfilled, (s) => {
+        const now = new Date().toISOString();
+        s.list.forEach((m) => {
+          if (!m.readAt) m.readAt = now;
+        });
       })
       .addCase(setMessageLabels.fulfilled, (s, a) => {
         // We don't have the label details here; clear and let MessageView re-fetch
