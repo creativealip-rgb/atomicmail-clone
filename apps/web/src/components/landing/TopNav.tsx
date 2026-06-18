@@ -8,13 +8,13 @@ export function TopNav() {
       <Link to="/" className={styles.brand}>
         <Logo size={32} />
         <span className={styles.brandText}>Chainmail</span>
-        <span className={styles.beta}>demo</span>
+        <span className={styles.beta}>early access</span>
       </Link>
 
       <nav className={styles.links}>
         <a href="#features">Features</a>
         <a href="#stack">Stack</a>
-        <a href="#design">Design system</a>
+        <a href="#design">Design</a>
         <a href="#architecture">Architecture</a>
         <a
           href="https://github.com/creativealip-rgb/chainmail"
@@ -24,7 +24,7 @@ export function TopNav() {
           GitHub →
         </a>
         <Link to="/app/auth/sign-in" className={styles.cta}>
-          Launch app →
+          Try demo →
         </Link>
       </nav>
     </header>

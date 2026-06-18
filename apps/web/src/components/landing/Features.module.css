@@ -41,6 +41,35 @@
   margin-bottom: var(--space-3);
 }
 
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.cardHeader .title { margin: 0; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.badge[data-status="shipped"] {
+  background: rgba(12, 232, 132, 0.12);
+  color: #00b95c;
+}
+.badge[data-status="wip"] {
+  background: rgba(251, 188, 4, 0.14);
+  color: #b47800;
+}
+
 .title {
   font-size: var(--fs-lg);
   font-weight: var(--fw-semibold);

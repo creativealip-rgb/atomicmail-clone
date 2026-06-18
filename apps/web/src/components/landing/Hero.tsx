@@ -8,31 +8,31 @@ export function Hero() {
     <section className={styles.hero}>
       <div className={styles.badge}>
         <span className={styles.dot} />
-        <span>Live demo · Boilerplate</span>
+        <span>Early access · WIP</span>
       </div>
 
       <h1 className={styles.title}>
-        Encrypted email,
+        Your on-chain receipts.
         <br />
-        <span className={styles.gradient}>open source.</span>
+        <span className={styles.gradient}>Encrypted. Tax-ready.</span>
       </h1>
 
       <p className={styles.subtitle}>
-        Your on-chain receipts. Encrypted. Searchable. Tax-ready.
-        zero-access storage, modern React + Vite stack. Built for learning and
-        self-hosting.
+        Forward emails from Coinbase, Binance, OpenSea — Chainmail auto-parses
+        CEX, DEX, and NFT receipts into a searchable, encrypted archive.
+        Koinly-compatible CSV at tax season. Gmail stays primary.
       </p>
 
       <div className={styles.cta}>
         <Link to="/app/auth/sign-in">
-          <Button size="lg">Try the app →</Button>
+          <Button size="lg">Try the demo →</Button>
         </Link>
         <a
           href="https://github.com/creativealip-rgb/chainmail"
           target="_blank"
           rel="noreferrer"
         >
-          <Button size="lg" variant="secondary">View source</Button>
+          <Button size="lg" variant="secondary">Read source</Button>
         </a>
       </div>
 

@@ -5,6 +5,11 @@ interface Props {
   withText?: boolean;
 }
 
+/**
+ * Chainmail weave logo — 4 interlocking rings forming a square pattern.
+ * Concept: medieval mail armor × crypto chain links.
+ * Outer ring: brand/purple-deep · inner: teal→blue gradient
+ */
 export function Logo({ size = 32, withText = false }: Props) {
   return (
     <span className={styles.wrap} style={{ fontSize: size }}>
@@ -18,15 +23,23 @@ export function Logo({ size = 32, withText = false }: Props) {
         aria-label="Chainmail"
       >
         <defs>
-          <linearGradient id="atomGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0DF189" />
-            <stop offset="100%" stopColor="#067DF7" />
+          <linearGradient id="chainGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#0CE884" />
+            <stop offset="50%" stopColor="#067DF7" />
+            <stop offset="100%" stopColor="#6648FF" />
           </linearGradient>
         </defs>
-        <circle cx="16" cy="16" r="3" fill="url(#atomGrad)" />
-        <ellipse cx="16" cy="16" rx="13" ry="5" stroke="url(#atomGrad)" strokeWidth="1.5" transform="rotate(0 16 16)" />
-        <ellipse cx="16" cy="16" rx="13" ry="5" stroke="url(#atomGrad)" strokeWidth="1.5" transform="rotate(60 16 16)" />
-        <ellipse cx="16" cy="16" rx="13" ry="5" stroke="url(#atomGrad)" strokeWidth="1.5" transform="rotate(120 16 16)" />
+        {/* Four interlocking rings in 2x2 grid, each overlaps its 2 neighbors */}
+        {/* top-left ring */}
+        <circle cx="11" cy="11" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        {/* top-right ring */}
+        <circle cx="21" cy="11" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        {/* bottom-left ring */}
+        <circle cx="11" cy="21" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        {/* bottom-right ring */}
+        <circle cx="21" cy="21" r="7" stroke="url(#chainGrad)" strokeWidth="2" fill="none" />
+        {/* center accent dot */}
+        <circle cx="16" cy="16" r="2" fill="url(#chainGrad)" />
       </svg>
       {withText && <span className={styles.text}>Chainmail</span>}
     </span>
