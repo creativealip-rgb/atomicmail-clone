@@ -10,15 +10,17 @@
  *
  * Stores in messages table, runs parsers, normalizes into receipts table.
  *
- * NOTE: W3 stores plaintext body. W3.5 will add per-user keypair encryption.
+ * W3.5: encrypts body with per-user X25519 envelope encryption before storage.
+ *       Plaintext bodyText/bodyHtml are NEVER stored.
  */
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { aliases, messages, receipts } from "../db/schema/index.js";
+import { aliases, messages, receipts, users } from "../db/schema/index.js";
 import { env } from "../lib/env.js";
 import { parseEmail, type EmailKind } from "parsers";
+import { encryptForRecipient } from "@ui/crypto";
 import type { ChainmailVars } from "../middleware/auth.js";
 
 const envelopeSchema = z.object({
@@ -72,17 +74,27 @@ ingestRoute.post("/", async (c) => {
   }
   const email = parsed.data;
 
-  // Find alias by email
-  const [alias] = await db
-    .select()
+  // Find alias by email (and join user to get their ECDH pub key)
+  const [row] = await db
+    .select({
+      alias: aliases,
+      userPub: users.publicKey,
+    })
     .from(aliases)
+    .innerJoin(users, eq(aliases.userId, users.id))
     .where(and(eq(aliases.email, email.to), eq(aliases.active, true)))
     .limit(1);
-  if (!alias) {
+
+  if (!row) {
     return c.json({ error: "alias not found or inactive", to: email.to }, 404);
   }
+  const alias = row.alias;
+  const userEcdhPub = row.userPub;
+  if (!userEcdhPub) {
+    return c.json({ error: "user has no encryption keypair", to: email.to }, 500);
+  }
 
-  // Run parsers
+  // Run parsers (operate on plaintext body)
   const parsedReceipt = parseEmail({
     from: email.from,
     fromName: email.fromName,
@@ -92,7 +104,12 @@ ingestRoute.post("/", async (c) => {
     receivedAt: email.receivedAt,
   });
 
-  // Insert message first (we need its ID for the receipt)
+  // W3.5: envelope-encrypt the body before storage
+  const plaintext = email.bodyText || email.bodyHtml || "";
+  const env2 = await encryptForRecipient(plaintext, userEcdhPub);
+  const encryptedJson = JSON.stringify(env2);
+
+  // Insert message — bodyText/bodyHtml are NEVER stored (only the envelope)
   const [insertedMsg] = await db
     .insert(messages)
     .values({
@@ -101,8 +118,9 @@ ingestRoute.post("/", async (c) => {
       fromName: email.fromName ?? null,
       toAddrs: [email.to],
       subject: email.subject || null,
-      bodyText: email.bodyText || null,
-      bodyHtml: email.bodyHtml ?? null,
+      bodyText: null,        // PII protection — only envelope stored
+      bodyHtml: null,
+      encryptedBody: encryptedJson,
       messageIdHeader: email.messageIdHeader ?? null,
       receivedAt: email.receivedAt,
       parserKey: parsedReceipt?.parserKey ?? null,
@@ -113,11 +131,8 @@ ingestRoute.post("/", async (c) => {
   let receiptId: string | null = null;
   if (parsedReceipt) {
     const norm = normalizeReceipt(parsedReceipt);
-    // Strip commas/spaces from amount before numeric insert ("5,000,000" → "5000000")
     const rawAmount = typeof parsedReceipt.data.amount === "string" ? parsedReceipt.data.amount : null;
     const cleanAmount = rawAmount?.replace(/[,\s]/g, "") ?? null;
-    // Extract price + fiat fields. Only store in assetPriceUsd if currency is USD
-    // (DB column is numeric and assumes US format — can't store "1.250.000" IDR).
     const rawPrice = parsedReceipt.data as Record<string, unknown>;
     const fiat = typeof rawPrice.fiat === "string" ? rawPrice.fiat.toUpperCase() : null;
     const priceStr = typeof rawPrice.price === "string" ? rawPrice.price : typeof rawPrice.priceUsd === "string" ? rawPrice.priceUsd : null;
@@ -134,7 +149,7 @@ ingestRoute.post("/", async (c) => {
         chain: typeof parsedReceipt.data.chain === "string" ? parsedReceipt.data.chain : null,
         asset: typeof parsedReceipt.data.asset === "string" ? parsedReceipt.data.asset.toUpperCase() : null,
         amount: cleanAmount,
-        assetPriceUsd: cleanPrice, // store price in numeric column (whatever fiat, label is in raw.fiat)
+        assetPriceUsd: cleanPrice,
         txHash: typeof parsedReceipt.data.txHash === "string" ? parsedReceipt.data.txHash : null,
         counterparty: parsedReceipt.source,
         status: "confirmed",
@@ -144,7 +159,6 @@ ingestRoute.post("/", async (c) => {
       .returning({ id: receipts.id });
     receiptId = insertedReceipt.id;
 
-    // Backfill message.receiptId
     await db.update(messages).set({ receiptId }).where(eq(messages.id, insertedMsg.id));
   }
 
@@ -157,6 +171,7 @@ ingestRoute.post("/", async (c) => {
       parsed: parsedReceipt
         ? { kind: parsedReceipt.kind, summary: parsedReceipt.summary, confidence: parsedReceipt.confidence }
         : null,
+      encrypted: true,
     },
     201
   );

@@ -10,6 +10,8 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* tsconfig.base.json ./
 COPY services/api/package.json ./services/api/
 COPY services/parsers/package.json ./services/parsers/
 COPY services/parsers/tsconfig.json ./services/parsers/
+COPY packages/crypto/package.json ./packages/crypto/
+COPY packages/crypto/tsconfig.build.json ./packages/crypto/
 
 # Install all deps (build needs devDeps for tsc + tsx for migrate)
 RUN pnpm install --filter api... --frozen-lockfile=false
@@ -17,9 +19,12 @@ RUN pnpm install --filter api... --frozen-lockfile=false
 # Source
 COPY services/api/ ./services/api/
 COPY services/parsers/ ./services/parsers/
+COPY packages/crypto/ ./packages/crypto/
 
 # Compile parsers first (api depends on it)
 RUN pnpm --filter parsers build
+# Compile @ui/crypto package (api depends on it)
+RUN pnpm --filter @ui/crypto build
 # Compile API
 RUN pnpm --filter api build
 
@@ -36,6 +41,9 @@ COPY --from=builder /app/services/api/drizzle/ ./dist/drizzle/
 # Parsers package: package.json (with main/exports) + dist/ (compiled JS + .d.ts)
 COPY --from=builder /app/services/parsers/package.json ./node_modules/parsers/package.json
 COPY --from=builder /app/services/parsers/dist/ ./node_modules/parsers/dist/
+# @ui/crypto package: dist/ + package.json (for api runtime)
+COPY --from=builder /app/packages/crypto/package.json ./node_modules/@ui/crypto/package.json
+COPY --from=builder /app/packages/crypto/dist/ ./node_modules/@ui/crypto/dist/
 
 # Copy workspace root node_modules (real packages live in .pnpm/)
 COPY --from=builder /app/node_modules/ ./node_modules/

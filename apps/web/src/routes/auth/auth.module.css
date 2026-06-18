@@ -103,3 +103,107 @@
 .altLink a:hover {
   text-decoration: underline;
 }
+
+/* ── Recovery code (W3.5) ─────────────────────────────────── */
+
+.recoveryWarning {
+  padding: 0.85rem 1rem;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  color: #78350f;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.recoveryBox {
+  padding: 1.25rem;
+  background: var(--color-bg-alt, #f9fafb);
+  border: 1px solid var(--color-border, #d4d4d8);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.wordList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.wordItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e4e4e7);
+  border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.wordNum {
+  color: var(--color-text-muted, #9ca3af);
+  font-size: 0.7rem;
+  min-width: 1.1rem;
+  text-align: right;
+}
+
+.wordText {
+  font-weight: 500;
+  color: var(--color-text, #0a0a0a);
+}
+
+.codeText {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  color: var(--color-text, #0a0a0a);
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.recoveryActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.secondary {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  background: transparent;
+  color: var(--color-text, #0a0a0a);
+  border: 1px solid var(--color-border, #d4d4d8);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms;
+}
+
+.secondary:hover {
+  background: var(--color-bg-alt, #f4f4f5);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text, #0a0a0a);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}

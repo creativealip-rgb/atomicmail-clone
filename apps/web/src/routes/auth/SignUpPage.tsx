@@ -18,7 +18,16 @@ export default function SignUpPage() {
     if (password !== confirm) return;
     const result = await dispatch(signUp({ email, password }));
     if (signUp.fulfilled.match(result)) {
-      navigate("/app/mailbox/inbox", { replace: true });
+      const recoveryCode = result.payload.recoveryCode ?? null;
+      if (recoveryCode) {
+        // W3.5: show one-time recovery code screen before entering inbox
+        navigate("/app/setup-recovery", {
+          replace: true,
+          state: { recoveryCode, email: result.payload.user.email },
+        });
+      } else {
+        navigate("/app/mailbox/inbox", { replace: true });
+      }
     }
   };
 

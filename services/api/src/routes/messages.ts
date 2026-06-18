@@ -112,7 +112,7 @@ route.get("/messages/:id", async (c) => {
     }
   }
 
-  return c.json({ message: row, receipt: linkedReceipt });
+  return c.json({ message: row, receipt: linkedReceipt, encrypted: true });
 });
 
 // ── /api/receipts ──────────────────────────────────────────────

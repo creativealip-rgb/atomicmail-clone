@@ -134,6 +134,9 @@ importers:
       '@types/node':
         specifier: ^22.10.2
         version: 22.19.21
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
 
   packages/shared-types: {}
 
@@ -176,6 +179,9 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.4.1
         version: 0.4.3(hono@4.12.25)(zod@3.25.76)
+      '@ui/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
       drizzle-orm:
         specifier: ^0.36.4
         version: 0.36.4(@types/react@18.3.31)(postgres@3.4.9)(react@18.3.1)

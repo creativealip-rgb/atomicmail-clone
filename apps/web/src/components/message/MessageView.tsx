@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 import type { ApiMessageDetail, ApiReceipt } from "@/store/slices/messagesSlice";
+import { decryptMessageBody, getUnlockedKey, type KeyPair } from "@/services/crypto/vault";
 import styles from "./MessageView.module.css";
 
 interface Props {
@@ -18,9 +21,7 @@ function formatAmount(n: number | string): string {
   if (!Number.isFinite(num)) return String(n);
   if (num === 0) return "0";
   if (Math.abs(num) < 0.0001) return num.toExponential(4);
-  // Strip trailing zeros from fixed decimals, max 8 places
   const fixed = num.toFixed(8).replace(/\.?0+$/, "");
-  // Add thousands separator to integer part
   const [int = "0", dec] = fixed.split(".");
   const withCommas = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return dec ? `${withCommas}.${dec}` : withCommas;
@@ -31,7 +32,12 @@ export function MessageView({ messageId }: Props) {
   const [receipt, setReceipt] = useState<ApiReceipt | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [decryptedBody, setDecryptedBody] = useState<string | null>(null);
+  const [decrypting, setDecrypting] = useState(false);
+  const userId = useSelector((s: RootState) => s.auth.user?.id);
+  const demoMode = useSelector((s: RootState) => s.auth.demoMode);
 
+  // Fetch message + receipt
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -59,6 +65,37 @@ export function MessageView({ messageId }: Props) {
       cancelled = true;
     };
   }, [messageId]);
+
+  // W3.5: decrypt the envelope using the unlocked keypair (real user, not demo)
+  useEffect(() => {
+    if (!msg || !msg.encryptedBody || demoMode || !userId) {
+      setDecryptedBody(null);
+      return;
+    }
+    let cancelled = false;
+    setDecrypting(true);
+    (async () => {
+      try {
+        const kp = await getUnlockedKey(userId);
+        if (!kp) {
+          if (!cancelled) setDecryptedBody(null);
+          return;
+        }
+        const plain = await decryptMessageBody(msg.encryptedBody as string, kp);
+        if (!cancelled) setDecryptedBody(plain);
+      } catch (err) {
+        if (!cancelled) {
+          console.error("decrypt failed", err);
+          setDecryptedBody(null);
+        }
+      } finally {
+        if (!cancelled) setDecrypting(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [msg, userId, demoMode]);
 
   if (loading) return <div className={styles.empty}>Loading…</div>;
   if (error) return <div className={styles.empty}>Failed to load: {error}</div>;
@@ -167,9 +204,19 @@ export function MessageView({ messageId }: Props) {
       </nav>
 
       <div className={styles.body}>
-        {(msg.bodyText ?? "(empty body)").split("\n").map((line, i) => (
-          <p key={i}>{line || "\u00a0"}</p>
-        ))}
+        {decryptedBody !== null ? (
+          decryptedBody.split("\n").map((line, i) => (
+            <p key={i}>{line || "\u00a0"}</p>
+          ))
+        ) : decrypting ? (
+          <p className={styles.empty}>🔐 Decrypting…</p>
+        ) : msg.encryptedBody && !demoMode ? (
+          <p className={styles.empty}>🔒 Locked. Re-enter your password to read this message.</p>
+        ) : (
+          (msg.bodyText ?? "(empty body)").split("\n").map((line, i) => (
+            <p key={i}>{line || "\u00a0"}</p>
+          ))
+        )}
       </div>
     </article>
   );
