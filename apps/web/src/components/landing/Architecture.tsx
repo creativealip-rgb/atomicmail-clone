@@ -31,27 +31,6 @@ export function Architecture() {
           </div>
         ))}
       </div>
-
-      <div className={styles.flow}>
-        <h3 className={styles.flowTitle}>Data flow</h3>
-        <pre className={styles.code}>
-{`[Gmail filter]  →  [chainmail.app MX]  →  [Haraka :25]
-                                            ↓ raw MIME
-                                      [API /api/ingest]
-                                            ↓
-                                      [BullMQ: parse]
-                                            ↓
-                                      [packages/parsers]
-                                            ↓ normalized Receipt
-                                      [Postgres: messages + receipts]
-                                            ↓
-                                      [WebSocket: push to client]
-                                            ↓
-                                      [encrypted blob: client decrypts]
-                                            ↓
-                                      [UI: searchable, tagged, tax-ready]`}
-        </pre>
-      </div>
     </section>
   );
 }

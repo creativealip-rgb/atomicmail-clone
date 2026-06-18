@@ -62,28 +62,3 @@
   color: var(--color-neutral-600);
   line-height: var(--lh-loose);
 }
-
-.flow {
-  max-width: 760px;
-  margin: 0 auto;
-  background: #0F0F0F;
-  border-radius: var(--r-xl);
-  padding: var(--space-6);
-  color: #E5E5E5;
-}
-.flowTitle {
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-semibold);
-  color: white;
-  margin: 0 0 var(--space-4);
-  font-family: var(--font-sans);
-}
-.code {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-  margin: 0;
-  white-space: pre;
-  overflow-x: auto;
-  color: #0DF189;
-}
