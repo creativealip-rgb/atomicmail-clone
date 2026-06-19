@@ -8,7 +8,7 @@ export function TopNav() {
       <Link to="/" className={styles.brand}>
         <Logo size={32} />
         <span className={styles.brandText}>Chainmail</span>
-        <span className={styles.beta}>early access</span>
+        <span className={styles.beta}>demo live</span>
       </Link>
 
       <nav className={styles.links}>

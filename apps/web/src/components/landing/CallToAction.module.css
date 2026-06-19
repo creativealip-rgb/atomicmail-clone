@@ -33,3 +33,16 @@
   justify-content: center;
   flex-wrap: wrap;
 }
+
+.fineprint {
+  margin-top: var(--space-5) !important;
+  margin-bottom: 0 !important;
+  font-size: var(--fs-sm) !important;
+  color: var(--text-muted) !important;
+}
+.fineprint a {
+  color: var(--color-brand-blue);
+  text-decoration: none;
+  font-weight: var(--fw-medium);
+}
+.fineprint a:hover { text-decoration: underline; }

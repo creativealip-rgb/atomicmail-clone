@@ -5,6 +5,7 @@ import { Features } from "@/components/landing/Features";
 import { Architecture } from "@/components/landing/Architecture";
 import { CallToAction } from "@/components/landing/CallToAction";
 import { TopNav } from "@/components/landing/TopNav";
+import { TrustPanel } from "@/components/landing/TrustPanel";
 
 import { Footer } from "@/components/landing/Footer";
 import styles from "./LandingPage.module.css";
@@ -16,6 +17,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <Features />
+        <TrustPanel />
         <Architecture />
         <CallToAction />
       </main>

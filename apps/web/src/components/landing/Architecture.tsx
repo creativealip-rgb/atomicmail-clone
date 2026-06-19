@@ -4,7 +4,7 @@ import styles from "./Architecture.module.css";
 const LAYERS = [
   { name: "Inbox",    tech: "Haraka SMTP",                  detail: "budi+a7f2@chainmail.app" },
   { name: "Ingest",   tech: "BullMQ worker",                detail: "raw MIME → message row" },
-  { name: "Parser",   tech: `packages/parsers (${ACTIVE_PARSER_COUNT} live)`, detail: Object.keys(PARSER_REGISTRY).join(" · ") },
+  { name: "Parser",   tech: `${ACTIVE_PARSER_COUNT} parsers live`, detail: Object.keys(PARSER_REGISTRY).join(" · ") },
   { name: "Storage",  tech: "Postgres + R2",                detail: "encrypted blobs · indexed receipts" },
   { name: "Realtime", tech: "Socket.IO",                    detail: "receipt:new · folder:unread" },
   { name: "API",      tech: "Hono + Drizzle",               detail: "api.chainmail.app" },

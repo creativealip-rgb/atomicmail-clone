@@ -18,7 +18,7 @@ export function Footer() {
           <a href="https://github.com/creativealip-rgb/chainmail/blob/main/README.md" target="_blank" rel="noreferrer">README</a>
         </div>
         <p className={styles.note}>
-          Open-source under MIT. Built by Alip.
+          Open-source under MIT. Built by Alip. Crypto receipt archive for Gmail-first workflows.
         </p>
       </div>
     </footer>

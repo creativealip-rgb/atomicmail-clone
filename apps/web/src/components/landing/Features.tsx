@@ -8,8 +8,8 @@ const FEATURES = [
     status: "shipped",
   },
   {
-    title: `${ACTIVE_PARSER_COUNT} parsers, CEX + DEX + NFT + explorer`,
-    body: `Coinbase, Binance, Etherscan at launch. Kraken, Tokocrypto, Uniswap, OpenSea, Phantom, MetaMask, Indodax now live. Each parser tested against real emails.`,
+    title: `${ACTIVE_PARSER_COUNT} receipt parsers live`,
+    body: `CEX, DEX, NFT, wallet, and explorer emails covered: Coinbase, Binance, Etherscan, Kraken, Tokocrypto, Uniswap, OpenSea, Phantom, MetaMask, Indodax. Each parser tested against real emails.`,
     status: "shipped",
   },
   {

@@ -8,9 +8,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--space-6);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: var(--space-4);
+  align-items: center;
 }
 .brand {
   display: flex;
@@ -34,9 +35,14 @@
 .links a:hover { color: var(--color-neutral-900); text-decoration: none; }
 
 .note {
+  grid-column: 1 / -1;
   font-size: var(--fs-xs);
-  color: var(--text-faint);
+  color: var(--text-muted);
   margin: 0;
   border-top: 1px solid var(--border-subtle);
   padding-top: var(--space-3);
+}
+
+@media (max-width: 700px) {
+  .inner { grid-template-columns: 1fr; }
 }

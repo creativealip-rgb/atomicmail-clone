@@ -82,7 +82,7 @@
 
 .body {
   font-size: var(--fs-sm);
-  color: var(--text-muted);
-  line-height: var(--lh-loose);
+  color: var(--text-secondary);
+  line-height: 1.7;
   margin: 0;
 }

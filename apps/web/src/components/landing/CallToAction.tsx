@@ -12,14 +12,14 @@ export function CallToAction() {
       </p>
       <div className={styles.buttons}>
         <Link to="/app/auth/sign-in">
-          <Button size="lg">Open demo →</Button>
+          <Button size="lg">Try demo →</Button>
         </Link>
         <a
           href="https://github.com/creativealip-rgb/chainmail"
           target="_blank"
           rel="noreferrer"
         >
-          <Button size="lg" variant="secondary">Star on GitHub</Button>
+          <Button size="lg" variant="secondary">View on GitHub</Button>
         </a>
       </div>
       <p className={styles.fineprint}>
