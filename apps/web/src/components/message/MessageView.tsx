@@ -181,22 +181,27 @@ export function MessageView({ messageId }: Props) {
         )}
         <h1 className={styles.subject}>{msg.subject ?? "(no subject)"}</h1>
         <div className={styles.meta}>
-          <strong>{isOutbound ? msg.aliasEmail : msg.fromName ?? msg.fromAddr}</strong>
-          {!isOutbound && <span className={styles.fromAddr}>&lt;{msg.fromAddr}&gt;</span>}
-          <span className={styles.metaRow}>
-            To:{" "}
+          <div className={styles.metaRow}>
+            <strong>{isOutbound ? msg.aliasEmail : msg.fromName ?? msg.fromAddr}</strong>
+            {!isOutbound && <span className={styles.fromAddr}>&lt;{msg.fromAddr}&gt;</span>}
+          </div>
+          <div className={styles.metaRow}>
+            <span className={styles.metaLabel}>To:</span>
             <span className={styles.toAddrList}>
               {(msg.toAddrs ?? []).map((a, i) => (
                 <span key={a} className={styles.toAddr}>
                   {a}
-                  {i < (msg.toAddrs?.length ?? 0) - 1 ? "" : ""}
+                  {i < (msg.toAddrs?.length ?? 0) - 1 ? "," : ""}
                 </span>
               ))}
             </span>
-          </span>
-          <span className={styles.timestamp}>
-            {new Date(msg.receivedAt).toLocaleString()}
-          </span>
+          </div>
+          <div className={styles.metaRow}>
+            <span className={styles.metaLabel}>Date:</span>
+            <span className={styles.timestamp}>
+              {new Date(msg.receivedAt).toLocaleString()}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -211,7 +216,7 @@ export function MessageView({ messageId }: Props) {
             {receipt.amount != null && (
               <>
                 <dt>Amount</dt>
-                <dd>
+                <dd className={styles.receiptValuePlain}>
                   {formatAmount(receipt.amount)} {receipt.asset}
                 </dd>
               </>
@@ -219,7 +224,9 @@ export function MessageView({ messageId }: Props) {
             {receipt.chain && (
               <>
                 <dt>Chain</dt>
-                <dd>{receipt.chain}</dd>
+                <dd>
+                  <span className={styles.receiptPill}>{receipt.chain}</span>
+                </dd>
               </>
             )}
             {receipt.txHash && (
@@ -231,13 +238,13 @@ export function MessageView({ messageId }: Props) {
             {receipt.counterparty && (
               <>
                 <dt>Counterparty</dt>
-                <dd>{receipt.counterparty}</dd>
+                <dd className={styles.receiptValuePlain}>{receipt.counterparty}</dd>
               </>
             )}
             {receipt.pricePerUnit != null && (
               <>
                 <dt>Price / unit</dt>
-                <dd>
+                <dd className={styles.receiptValuePlain}>
                   {receipt.pricePerUnit} {receipt.fiat ?? ""}
                 </dd>
               </>
@@ -245,7 +252,7 @@ export function MessageView({ messageId }: Props) {
             {receipt.fiatAmount != null && (
               <>
                 <dt>Total</dt>
-                <dd>
+                <dd className={styles.receiptValuePlain}>
                   {receipt.fiatAmount} {receipt.fiat ?? ""}
                 </dd>
               </>
@@ -282,17 +289,20 @@ export function MessageView({ messageId }: Props) {
             <path d="M10 11v6M14 11v6" />
             <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
           </svg>
+          Delete
         </button>
-        <button className={styles.iconBtn} title="Mark as Junk">
+        <button className={styles.iconBtn} title="Mark as Spam">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
             <line x1="4" y1="22" x2="4" y2="15" />
           </svg>
+          Spam
         </button>
         <button className={styles.iconBtn} title="Star">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
+          Star
         </button>
         <LabelPicker messageId={msg.id} />
         <span className={styles.spacer} />
@@ -311,33 +321,36 @@ export function MessageView({ messageId }: Props) {
         </button>
       </nav>
 
-      <div className={styles.body}>
-        {decryptedBody !== null ? (
-          decryptedBody.split("\n").map((line, i) => (
-            <p key={i}>{line || "\u00a0"}</p>
-          ))
-        ) : decrypting ? (
-          <p className={styles.empty}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ verticalAlign: "-3px", marginRight: 6 }}>
-              <rect x="3" y="11" width="18" height="11" rx="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            Decrypting…
-          </p>
-        ) : msg.encryptedBody && !demoMode ? (
-          <p className={styles.empty}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ verticalAlign: "-3px", marginRight: 6 }}>
-              <rect x="3" y="11" width="18" height="11" rx="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            Locked. Re-enter your password to read this message.
-          </p>
-        ) : (
-          (msg.bodyText ?? "(empty body)").split("\n").map((line, i) => (
-            <p key={i}>{line || "\u00a0"}</p>
-          ))
-        )}
-      </div>
+      <section className={styles.bodyShell} aria-label="Message body">
+        <h2 className={styles.bodyTitle}>Message body</h2>
+        <div className={styles.body}>
+          {decryptedBody !== null ? (
+            decryptedBody.split("\n").map((line, i) => (
+              <p key={i}>{line || " "}</p>
+            ))
+          ) : decrypting ? (
+            <p className={styles.empty}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ verticalAlign: "-3px", marginRight: 6 }}>
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Decrypting…
+            </p>
+          ) : msg.encryptedBody && !demoMode ? (
+            <p className={styles.empty}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ verticalAlign: "-3px", marginRight: 6 }}>
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Locked. Re-enter your password to read this message.
+            </p>
+          ) : (
+            (msg.bodyText ?? "(empty body)").split("\n").map((line, i) => (
+              <p key={i}>{line || " "}</p>
+            ))
+          )}
+        </div>
+      </section>
     </article>
   );
 }

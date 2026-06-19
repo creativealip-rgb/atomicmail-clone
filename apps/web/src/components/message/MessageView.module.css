@@ -8,12 +8,12 @@
 
 /* ---------- Header ---------- */
 .header {
-  padding: var(--space-5) var(--space-6) var(--space-4);
+  padding: var(--space-6) var(--space-6) var(--space-5);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 .subject {
   margin: 0;
@@ -27,8 +27,7 @@
   flex-direction: column;
   gap: var(--space-1);
   font-size: var(--fs-sm);
-  color: var(--text-muted);
-  margin-top: var(--space-1);
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 .meta strong { color: var(--text-primary); font-weight: var(--fw-semibold); }
@@ -37,6 +36,16 @@
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+.metaRow strong {
+  margin-right: var(--space-1);
+}
+.metaLabel {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
 }
 
 /* ---------- Action toolbar ---------- */
@@ -51,11 +60,11 @@
 .iconBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  gap: 6px;
+  padding: 0 var(--space-3);
   height: 30px;
   font-size: var(--fs-sm);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--r-md);
@@ -77,19 +86,35 @@
 .spacer { flex: 1; }
 
 /* ---------- Body ---------- */
-.body {
+.bodyShell {
   flex: 1;
-  padding: var(--space-6);
   overflow-y: auto;
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  background: var(--bg-base);
+}
+.bodyTitle {
+  max-width: 720px;
+  margin: 0 auto var(--space-2);
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.body {
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
-  font-size: var(--fs-base);
-  line-height: var(--lh-loose);
-  color: var(--text-primary);
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
   background: var(--bg-surface);
+  box-shadow: var(--shadow-xs);
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--text-primary);
 }
-.body p { margin: 0 0 var(--space-3); }
+.body p { margin: 0 0 var(--space-2); }
 .body p:last-child { margin-bottom: 0; }
 
 /* ---------- Empty state ---------- */
@@ -119,17 +144,23 @@
 
 /* ---------- From / To / Timestamp ---------- */
 .fromAddr,
-.toAddr,
 .timestamp {
-  color: var(--text-faint);
-  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-family: var(--font-sans, system-ui);
+}
+.fromAddr {
   font-family: ui-monospace, monospace;
+  font-size: var(--fs-xs);
 }
 .toAddr {
   background: var(--bg-base);
-  padding: 1px 6px;
+  color: var(--text-primary);
+  padding: 1px 8px;
   border-radius: var(--r-sm);
-  margin: 0 2px;
+  border: 1px solid var(--border-subtle);
+  font-family: ui-monospace, monospace;
+  font-size: var(--fs-xs);
 }
 .toAddrList {
   display: inline-flex;
@@ -138,16 +169,14 @@
   gap: 4px;
 }
 .timestamp {
-  font-family: var(--font-sans, system-ui);
-  font-size: var(--fs-xs);
-  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Parsed receipt block ---------- */
 .receipt {
   margin: 0;
   padding: var(--space-5) var(--space-6);
-  background: var(--bg-base);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -155,11 +184,11 @@
 }
 .receiptTitle {
   margin: 0;
-  font-size: var(--fs-sm);
+  font-size: 11px;
   font-weight: var(--fw-semibold);
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 .receiptGrid {
   display: grid;
@@ -167,9 +196,10 @@
   gap: var(--space-2) var(--space-4);
   margin: 0;
   font-size: var(--fs-sm);
+  align-items: center;
 }
 .receiptGrid dt {
-  color: var(--text-faint);
+  color: var(--text-secondary);
   font-weight: var(--fw-medium);
   padding-top: 1px;
 }
@@ -181,22 +211,37 @@
   align-items: center;
   gap: var(--space-1);
 }
-.receiptType {
+.receiptType,
+.receiptPill {
   display: inline-flex;
   align-items: center;
   padding: 2px var(--space-2);
   border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+}
+.receiptType {
   background: var(--color-brand-blue);
   color: #fff;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+}
+.receiptPill {
+  background: rgba(6, 125, 247, 0.1);
+  color: var(--color-brand-blue);
+  border: 1px solid rgba(6, 125, 247, 0.22);
+}
+.receiptValuePlain {
+  font-family: var(--font-sans, system-ui);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
 }
 .txHash {
   word-break: break-all;
   font-size: var(--fs-xs);
+  color: var(--text-secondary);
 }
 
 /* ---------- Outbound status banner ---------- */

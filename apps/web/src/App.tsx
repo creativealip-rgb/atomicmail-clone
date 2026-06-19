@@ -6,6 +6,7 @@ import { open as openComposer } from "@/store/slices/composerSlice";
 import { dismiss as dismissToast } from "@/store/slices/notificationsSlice";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { ProfileModal } from "@/components/profile/ProfileModal";
 
 // Landing is loaded immediately (it's the homepage)
 import LandingPage from "@/routes/LandingPage";
@@ -56,6 +57,7 @@ function GlobalShortcuts() {
   const navigate = useNavigate();
   const isAuth = useAppSelector((s) => s.auth.isAuthenticated);
   const composerOpen = useAppSelector((s) => s.composer.open);
+  const activeModal = useAppSelector((s) => s.ui.activeModal);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -69,10 +71,10 @@ function GlobalShortcuts() {
         return;
       }
 
-      if (e.key === "Escape") {
-        if (composerOpen) {
-          dispatch({ type: "composer/close" });
-        }
+      if (activeModal) return;
+
+      if (e.key === "Escape" && composerOpen) {
+        dispatch({ type: "composer/close" });
         return;
       }
 
@@ -103,9 +105,15 @@ function GlobalShortcuts() {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [dispatch, navigate, isAuth, composerOpen]);
+  }, [dispatch, navigate, isAuth, composerOpen, activeModal]);
 
   return null;
+}
+
+function ProfileModalGate() {
+  const activeModal = useAppSelector((s) => s.ui.activeModal);
+  if (activeModal !== "profile") return null;
+  return <ProfileModal />;
 }
 
 export function App() {
@@ -114,6 +122,7 @@ export function App() {
       <PageTitle />
       <GlobalShortcuts />
       <ToastContainer />
+      <ProfileModalGate />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route

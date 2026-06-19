@@ -81,9 +81,11 @@
 }
 
 .search {
-  flex: 1;
+  flex: 0 1 460px;
   position: relative;
-  max-width: 480px;
+  min-width: 240px;
+  max-width: 460px;
+  margin-left: auto;
 }
 .searchIcon {
   position: absolute;
