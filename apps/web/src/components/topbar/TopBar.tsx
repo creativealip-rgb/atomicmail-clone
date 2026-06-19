@@ -23,7 +23,7 @@ export function TopBar() {
       )}
       {auth.isAuthenticated && (
         <div className={styles.liveBadge} role="status">
-          🟢 LIVE — {auth.user?.email ?? "signed in"}
+          <span>LIVE — {auth.user?.email ?? "signed in"}</span>
           <button
             type="button"
             className={styles.signOutBtn}
