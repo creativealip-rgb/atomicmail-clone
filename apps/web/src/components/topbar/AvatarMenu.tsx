@@ -50,7 +50,7 @@ export function AvatarMenu({ user }: Props) {
         aria-haspopup
         aria-label="User menu"
       >
-        {user ? <Avatar name={user.email} size={32} /> : <Avatar name="?" size={32} />}
+        {user ? <Avatar name={user.email} size={30} /> : <Avatar name="?" size={30} />}
       </button>
 
       {open && (
