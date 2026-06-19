@@ -1,6 +1,7 @@
 import type { ApiMessage } from "@/store/slices/messagesSlice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { moveMessage, setMessageLabels, fetchMessageDetail, starMessage } from "@/store/slices/messagesSlice";
 import { decrementUnread } from "@/store/slices/foldersSlice";
 import { LabelPicker } from "@/components/message/LabelPicker";
@@ -80,6 +81,75 @@ export function MessageList({ messages }: Props) {
   const activeFolder = useAppSelector((s) => s.messages.activeFolder);
   const labels = useAppSelector((s) => s.folders.labels);
   const labelsByMessage = useAppSelector((s) => s.messages.labelsByMessage);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const rowRefs = useRef<Array<HTMLLIElement | null>>([]);
+
+  // Clamp activeIndex when message list shrinks (e.g. after trash)
+  useEffect(() => {
+    if (activeIndex >= messages.length) {
+      setActiveIndex(Math.max(0, messages.length - 1));
+    }
+  }, [messages.length, activeIndex]);
+
+  // Scroll active row into view
+  useEffect(() => {
+    const row = rowRefs.current[activeIndex];
+    row?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
+  // j/k navigation + Enter to open, e to archive, # to trash, s to star
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const key = e.key.toLowerCase();
+      if (key === "j") {
+        e.preventDefault();
+        setActiveIndex((i) => Math.min(messages.length - 1, i + 1));
+      } else if (key === "k") {
+        e.preventDefault();
+        setActiveIndex((i) => Math.max(0, i - 1));
+      } else if (key === "arrowdown") {
+        e.preventDefault();
+        setActiveIndex((i) => Math.min(messages.length - 1, i + 1));
+      } else if (key === "arrowup") {
+        e.preventDefault();
+        setActiveIndex((i) => Math.max(0, i - 1));
+      } else if (key === "enter") {
+        const m = messages[activeIndex];
+        if (m) {
+          e.preventDefault();
+          handleOpen(m);
+        }
+      } else if (key === "e" || key === "#") {
+        const m = messages[activeIndex];
+        if (m) {
+          e.preventDefault();
+          const folder = key === "#" ? "trash" : "archive";
+          dispatch(moveMessage({ id: m.id, folder }));
+          dispatch(pushToast({ type: "success", message: folder === "trash" ? "Moved to Trash" : "Archived" }));
+        }
+      } else if (key === "s") {
+        const m = messages[activeIndex];
+        if (m) {
+          e.preventDefault();
+          dispatch(starMessage({ id: m.id, starred: !m.starred }));
+        }
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, activeIndex, navigate, activeFolder, dispatch]);
 
   const handleOpen = (m: ApiMessage) => {
     if (!m.readAt) {
@@ -100,8 +170,17 @@ export function MessageList({ messages }: Props) {
       return;
     }
     if (action === "trash") {
+      const sourceFolder = activeFolder;
       dispatch(moveMessage({ id: m.id, folder: "trash" }));
-      dispatch(pushToast({ type: "success", message: "Moved to Trash" }));
+      dispatch(pushToast({
+        type: "success",
+        message: "Moved to Trash",
+        action: { label: "Undo", type: "button" },
+        onUndo: () => {
+          dispatch(moveMessage({ id: m.id, folder: sourceFolder }));
+          dispatch(pushToast({ type: "info", message: `Restored to ${sourceFolder}` }));
+        },
+      }));
     }
     if (action === "archive") {
       dispatch(moveMessage({ id: m.id, folder: "archive" }));
@@ -114,18 +193,25 @@ export function MessageList({ messages }: Props) {
   };
 
   return (
-    <ul className={styles.list}>
-      {messages.map((m) => {
+    <ul className={styles.list} ref={listRef}>
+      {messages.map((m, i) => {
         const badge = parserMeta(m.parserKey);
         const msgLabels = labelsByMessage[m.id] ?? [];
         const isOutbound = m.direction === "outbound";
+        const isActive = i === activeIndex;
         return (
           <li
             key={m.id}
-            className={m.readAt ? styles.row : `${styles.row} ${styles.rowUnread}`}
-            onClick={() => handleOpen(m)}
+            ref={(el) => { rowRefs.current[i] = el; }}
+            className={
+              `${m.readAt ? styles.row : `${styles.row} ${styles.rowUnread}`}`
+              + (isActive ? ` ${styles.rowActive}` : "")
+            }
+            data-active={isActive ? "true" : undefined}
+            onClick={() => { setActiveIndex(i); handleOpen(m); }}
             role="button"
-            tabIndex={0}
+            tabIndex={isActive ? 0 : -1}
+            onFocus={() => setActiveIndex(i)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();

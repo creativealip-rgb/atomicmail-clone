@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { dismiss } from "@/store/slices/notificationsSlice";
+import { dismiss, getUndoHandler } from "@/store/slices/notificationsSlice";
 import styles from "./ToastContainer.module.css";
 
 const AUTO_DISMISS_MS = 4500;
@@ -58,12 +58,18 @@ export function ToastContainer() {
         >
           <span className={styles.icon}>{ICONS[t.type] ?? ICONS.info}</span>
           <span className={styles.message}>{t.message}</span>
-          {t.action && (
-            t.action.href ? (
-              <a href={t.action.href} className={styles.action}>{t.action.label}</a>
-            ) : (
-              <button type="button" className={styles.action}>{t.action.label}</button>
-            )
+          {t.action && t.action.type === "button" && (
+            <button
+              type="button"
+              className={styles.action}
+              onClick={() => {
+                const handler = getUndoHandler(t.id);
+                if (handler) handler();
+                dispatch(dismiss(t.id));
+              }}
+            >
+              {t.action.label}
+            </button>
           )}
           <button
             type="button"

@@ -25,6 +25,14 @@
   background: var(--bg-hover);
 }
 
+.rowActive {
+  background: var(--bg-active);
+}
+.rowActive:focus-within,
+.rowActive:hover {
+  background: var(--bg-active);
+}
+
 .left {
   display: flex;
   align-items: center;
