@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Spinner } from "@ui/ui";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { open as openComposer } from "@/store/slices/composerSlice";
 import { dismiss as dismissToast } from "@/store/slices/notificationsSlice";
 import { ToastContainer } from "@/components/ui/ToastContainer";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Landing is loaded immediately (it's the homepage)
 import LandingPage from "@/routes/LandingPage";
@@ -16,6 +17,39 @@ const MessageRoute = lazy(() => import("@/routes/MessageRoute"));
 const EncryptedRoute = lazy(() => import("@/routes/EncryptedRoute"));
 const RecoverySetupPage = lazy(() => import("@/routes/auth/RecoverySetupPage"));
 const LedgerRoute = lazy(() => import("@/routes/LedgerRoute"));
+const NotFound = lazy(() => import("@/routes/NotFound"));
+
+const PAGE_TITLES: Record<string, string> = {
+  "/": "Chainmail — Encrypted email for the on-chain generation",
+  "/app": "Sign in · Chainmail",
+  "/app/auth/sign-in": "Sign in · Chainmail",
+  "/app/auth/sign-up": "Create account · Chainmail",
+  "/app/auth/recovery": "Recover account · Chainmail",
+  "/app/auth/welcome": "Welcome · Chainmail",
+  "/app/setup-recovery": "Save recovery code · Chainmail",
+  "/app/ledger": "Tax ledger · Chainmail",
+};
+
+function deriveTitle(pathname: string): string {
+  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
+  if (/^\/app\/mailbox\/[^/]+\/message\/[^/]+/.test(pathname)) return "Message · Chainmail";
+  if (/^\/app\/mailbox\//.test(pathname)) {
+    const folder = pathname.split("/")[3] ?? "Inbox";
+    return `${folder.charAt(0).toUpperCase()}${folder.slice(1)} · Chainmail`;
+  }
+  if (/^\/app\/label\//.test(pathname)) return "Label · Chainmail";
+  if (/^\/app\/encrypted\//.test(pathname)) return "Encrypted · Chainmail";
+  if (pathname.startsWith("/app")) return "Chainmail";
+  return "Page not found · Chainmail";
+}
+
+function PageTitle() {
+  const location = useLocation();
+  useEffect(() => {
+    document.title = deriveTitle(location.pathname);
+  }, [location.pathname]);
+  return null;
+}
 
 function GlobalShortcuts() {
   const dispatch = useAppDispatch();
@@ -25,7 +59,6 @@ function GlobalShortcuts() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Skip when user is typing in an input/textarea/contenteditable
       const target = e.target as HTMLElement | null;
       if (
         target &&
@@ -36,18 +69,13 @@ function GlobalShortcuts() {
         return;
       }
 
-      // Esc → close composer / dismiss top toast
       if (e.key === "Escape") {
         if (composerOpen) {
           dispatch({ type: "composer/close" });
-        } else {
-          // Will be picked up by ToastContainer via its own handler if focused,
-          // but also dismisses top-most here.
         }
         return;
       }
 
-      // Don't fire shortcuts with modifiers
       if (e.metaKey || e.ctrlKey || e.altKey) return;
 
       const key = e.key.toLowerCase();
@@ -62,7 +90,6 @@ function GlobalShortcuts() {
         );
         search?.focus();
       } else if (key === "g" && isAuth) {
-        // Mark next key as a goto
         sessionStorage.setItem("__awaitG", "1");
         setTimeout(() => sessionStorage.removeItem("__awaitG"), 1200);
       } else if (sessionStorage.getItem("__awaitG") === "1") {
@@ -83,7 +110,8 @@ function GlobalShortcuts() {
 
 export function App() {
   return (
-    <>
+    <ErrorBoundary>
+      <PageTitle />
       <GlobalShortcuts />
       <ToastContainer />
       <Routes>
@@ -99,14 +127,15 @@ export function App() {
                 <Route path="mailbox/:mailbox/message/:id" element={<MessageRoute />} />
                 <Route path="ledger" element={<LedgerRoute />} />
                 <Route path="encrypted/:key" element={<EncryptedRoute />} />
-                {/* W3.5: post-signup one-time recovery code display */}
                 <Route path="setup-recovery" element={<RecoverySetupPage />} />
                 <Route index element={<AuthLayout />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </ErrorBoundary>
   );
 }

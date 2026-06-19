@@ -133,6 +133,9 @@
   padding: 6px var(--space-2);
   border-radius: var(--r-sm);
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .miniFolder[data-active="true"] {
   background: var(--bg-base);
