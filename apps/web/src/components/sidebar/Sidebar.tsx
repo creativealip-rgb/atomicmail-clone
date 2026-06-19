@@ -63,7 +63,7 @@ export function Sidebar() {
           <path d="M12 20h9" />
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
         </svg>
-        Compose
+        <span className={styles.composeLabel}>Compose</span>
       </Link>
 
       <button className={styles.privacyCenter} onClick={() => dispatch(setPrivacyCenter(true))}>
@@ -71,7 +71,7 @@ export function Sidebar() {
           <rect x="3" y="11" width="18" height="11" rx="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
-        PRIVACY CENTER
+        <span className={styles.privacyLabel}>PRIVACY CENTER</span>
       </button>
 
       <Link
@@ -88,7 +88,7 @@ export function Sidebar() {
             <rect x="17" y="5" width="3" height="13" />
           </svg>
         </span>
-        Ledger
+        <span className={styles.ledgerLabel}>Ledger</span>
       </Link>
 
       <div className={styles.section}>

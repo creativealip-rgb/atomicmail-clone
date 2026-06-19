@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "@/services/api/client";
 import { parserMeta, chainMeta, ACTIVE_PARSER_COUNT } from "@/services/parserRegistry";
+import { Skeleton, SkeletonTableRows } from "@/components/ui/Skeleton";
 import styles from "./LedgerView.module.css";
 
 interface AssetBucket {
@@ -86,7 +87,33 @@ export function LedgerView({ year, isAuth }: { year: number; isAuth: boolean }) 
   if (!isAuth) {
     return <div className={styles.empty}>Sign in to view your ledger.</div>;
   }
-  if (loading) return <div className={styles.empty}>Loading ledger…</div>;
+  if (loading) {
+    return (
+      <div className={styles.view}>
+        <div className={styles.header}>
+          <div className={styles.hero}>
+            <Skeleton width={220} height={28} style={{ marginBottom: 8 }} />
+            <Skeleton width={340} height={14} />
+          </div>
+          <Skeleton width={120} height={30} radius="var(--r-md)" />
+        </div>
+        <div className={styles.grid}>
+          <section className={styles.section}>
+            <Skeleton width={100} height={14} style={{ marginBottom: 16 }} />
+            <SkeletonTableRows rows={6} cols={7} />
+          </section>
+          <section className={styles.section}>
+            <Skeleton width={100} height={14} style={{ marginBottom: 16 }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Skeleton width={80} height={22} radius="var(--r-sm)" />
+              <Skeleton width={70} height={22} radius="var(--r-sm)" />
+              <Skeleton width={90} height={22} radius="var(--r-sm)" />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
   if (error) return <div className={styles.empty}>Failed to load: {error}</div>;
   if (!data) return <div className={styles.empty}>No data.</div>;
 
@@ -120,7 +147,14 @@ export function LedgerView({ year, isAuth }: { year: number; isAuth: boolean }) 
 
       {data.totalReceipts === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyIllustration} aria-hidden>📊</div>
+          <div className={styles.emptyIllustration} aria-hidden>
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 3v18h18" />
+              <rect x="7" y="12" width="3" height="6" />
+              <rect x="12" y="8" width="3" height="10" />
+              <rect x="17" y="5" width="3" height="13" />
+            </svg>
+          </div>
           <p className={styles.emptyTitle}>No receipts for {year} yet</p>
           <p className={styles.muted}>
             Forward crypto emails to your alias — they'll be parsed and added to this ledger automatically.
@@ -224,7 +258,7 @@ export function LedgerView({ year, isAuth }: { year: number; isAuth: boolean }) 
                       background: count > 0
                         ? `rgba(15, 118, 110, ${intensity})`
                         : "var(--bg-base)",
-                      borderColor: count > 0 ? "var(--color-accent, #0f766e)" : "var(--border-subtle)",
+                      borderColor: count > 0 ? "var(--color-brand-teal)" : "var(--border-subtle)",
                     }}
                     title={`${MONTH_NAMES[m]} ${year}: ${count} receipt${count === 1 ? "" : "s"}`}
                   >

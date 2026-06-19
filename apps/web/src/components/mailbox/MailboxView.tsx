@@ -5,6 +5,7 @@ import { fetchAliases } from "@/store/slices/aliasesSlice";
 import { fetchFolders, fetchLabels } from "@/store/slices/foldersSlice";
 import { MessageList } from "./MessageList";
 import { ActionToolbar } from "./ActionToolbar";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import styles from "./MailboxView.module.css";
 
 interface Props {
@@ -40,7 +41,16 @@ export function MailboxView({ mailboxId, labelId }: Props) {
     return <div className={styles.empty}>Sign in to view your inbox.</div>;
   }
 
-  if (loading && list.length === 0) return <div className={styles.empty}>Loading…</div>;
+  if (loading && list.length === 0) {
+    return (
+      <div className={styles.view}>
+        <div className={styles.viewHeader}>
+          <SkeletonRow count={0} />
+        </div>
+        <SkeletonRow count={8} avatar />
+      </div>
+    );
+  }
   if (error) return <div className={styles.empty}>Failed to load: {error}</div>;
 
   // Determine current view title
