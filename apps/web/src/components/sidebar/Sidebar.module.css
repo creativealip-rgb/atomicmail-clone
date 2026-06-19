@@ -32,7 +32,7 @@
   text-transform: uppercase;
   font-weight: var(--fw-bold);
   letter-spacing: 0.08em;
-  background: rgba(6, 125, 247, 0.12);
+  background: rgba(6, 125, 247, 0.18);
   padding: 2px 7px;
   border-radius: var(--r-full);
   line-height: 1.4;
@@ -112,7 +112,7 @@
   font-weight: var(--fw-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--text-muted);
   height: 22px;
 }
 
@@ -290,7 +290,7 @@
   width: 100%;
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   border-radius: var(--r-md);
   background: transparent;
   border: 1px dashed var(--border-strong);

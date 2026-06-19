@@ -55,7 +55,7 @@
   padding: var(--space-2) var(--space-3);
   height: 30px;
   font-size: var(--fs-sm);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--r-md);
