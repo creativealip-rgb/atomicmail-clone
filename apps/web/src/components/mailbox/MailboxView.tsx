@@ -20,6 +20,14 @@ export function MailboxView({ mailboxId, labelId }: Props) {
   const labelList = useAppSelector((s) => s.folders.labels);
   const isAuth = useAppSelector((s) => s.auth.isAuthenticated);
   const demoMode = useAppSelector((s) => s.auth.demoMode) || import.meta.env.VITE_DEMO === "true";
+  const searchQuery = useAppSelector((s) => s.ui.searchQuery);
+  const trimmedQuery = searchQuery.trim().toLowerCase();
+  const filteredList = trimmedQuery
+    ? list.filter((m) => {
+        const hay = `${m.subject ?? ""} ${m.fromName ?? ""} ${m.fromAddr ?? ""} ${(m.toAddrs ?? []).join(" ")}`.toLowerCase();
+        return hay.includes(trimmedQuery);
+      })
+    : list;
 
   // Refetch whenever the active folder/label changes
   useEffect(() => {
@@ -160,7 +168,15 @@ export function MailboxView({ mailboxId, labelId }: Props) {
           )}
         </div>
       ) : (
-        <MessageList messages={list} />
+        <>
+          <MessageList messages={filteredList} />
+          {trimmedQuery && filteredList.length === 0 && list.length > 0 && (
+            <div className={styles.empty} role="status">
+              <p className={styles.emptyTitle}>No matches for "{searchQuery}"</p>
+              <p className={styles.empty}>Try a different keyword, or clear the search box.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

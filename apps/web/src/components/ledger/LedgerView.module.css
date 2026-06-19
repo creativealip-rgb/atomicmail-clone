@@ -69,6 +69,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
   padding: var(--space-4);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sectionTitle {
@@ -82,6 +84,7 @@
 
 .table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: var(--fs-sm);
 }
@@ -95,13 +98,20 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.table th.numCell { text-align: right; }
 
 .table td {
   padding: var(--space-3);
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .table tr:last-child td { border-bottom: none; }
@@ -118,10 +128,16 @@
   font-weight: var(--fw-medium);
 }
 
+.colAsset { width: 80px; }
+.colNum   { width: auto; }
+.colSwap  { width: 26%; }
+.colTx    { width: 44px; }
+
 .tagCloud {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  max-width: 100%;
 }
 
 .sourceTag {
@@ -135,6 +151,10 @@
   font-weight: var(--fw-semibold);
   letter-spacing: 0.02em;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chainBars {
@@ -145,7 +165,7 @@
 
 .chainRow {
   display: grid;
-  grid-template-columns: 100px 1fr 40px;
+  grid-template-columns: minmax(60px, auto) minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
 }
@@ -179,12 +199,12 @@
 
 .monthGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
 @media (max-width: 600px) {
-  .monthGrid { grid-template-columns: repeat(3, 1fr); }
+  .monthGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .monthCell {

@@ -166,6 +166,15 @@ export function LedgerView({ year, isAuth }: { year: number; isAuth: boolean }) 
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>By Asset</h2>
             <table className={styles.table}>
+              <colgroup>
+                <col className={styles.colAsset} />
+                <col className={styles.colNum} />
+                <col className={styles.colNum} />
+                <col className={styles.colNum} />
+                <col className={styles.colNum} />
+                <col className={styles.colSwap} />
+                <col className={styles.colTx} />
+              </colgroup>
               <thead>
                 <tr>
                   <th>Asset</th>
