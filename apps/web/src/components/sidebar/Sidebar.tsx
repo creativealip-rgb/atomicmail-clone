@@ -64,13 +64,13 @@ export function Sidebar() {
         <span className={styles.beta}>beta</span>
       </Link>
 
-      <Link to="/app/mailbox/inbox" className={styles.compose} onClick={() => dispatch(setActive("inbox"))}>
+      <button type="button" className={styles.compose} onClick={() => dispatch({ type: "composer/open" })}>
         <svg className={styles.composeIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M12 20h9" />
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
         </svg>
         <span className={styles.composeLabel}>Compose</span>
-      </Link>
+      </button>
 
       <button className={styles.privacyCenter} onClick={() => dispatch(setPrivacyCenter(true))}>
         <svg className={styles.menuIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

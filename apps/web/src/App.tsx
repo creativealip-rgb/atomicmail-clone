@@ -3,6 +3,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Spinner } from "@ui/ui";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { open as openComposer } from "@/store/slices/composerSlice";
+import { fetchMe } from "@/store/slices/authSlice";
 import { dismiss as dismissToast } from "@/store/slices/notificationsSlice";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -116,10 +117,21 @@ function ProfileModalGate() {
   return <ProfileModal />;
 }
 
+function AuthHydrator() {
+  const dispatch = useAppDispatch();
+  const isAuth = useAppSelector((s) => s.auth.isAuthenticated);
+  const user = useAppSelector((s) => s.auth.user);
+  useEffect(() => {
+    if (isAuth && !user) dispatch(fetchMe());
+  }, [dispatch, isAuth, user]);
+  return null;
+}
+
 export function App() {
   return (
     <ErrorBoundary>
       <PageTitle />
+      <AuthHydrator />
       <GlobalShortcuts />
       <ToastContainer />
       <ProfileModalGate />
