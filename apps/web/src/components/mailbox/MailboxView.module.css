@@ -34,17 +34,21 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--fs-sm);
-  color: var(--color-neutral-800);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 .toolbarBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   font-size: var(--fs-sm);
-  color: var(--color-neutral-800);
+  color: var(--text-secondary);
   border-radius: var(--r-md);
-  transition: background var(--d-fast) var(--ease-default);
+  transition: background var(--d-fast) var(--ease-default), color var(--d-fast) var(--ease-default);
 }
-.toolbarBtn:hover { background: var(--bg-hover); }
+.toolbarBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.toolbarBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .list { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
 
