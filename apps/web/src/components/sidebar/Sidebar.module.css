@@ -130,9 +130,25 @@
   transition: background var(--d-fast) var(--ease-default);
 }
 .folderItem:hover { background: var(--bg-hover); text-decoration: none; }
-.folderItem.active { background: var(--bg-surface); box-shadow: var(--shadow-xs); }
+.folderItem.active,
+.folderItem.active:hover {
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-xs);
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+}
+.folderItem.active .folderIcon { color: var(--color-brand-blue); }
 
-.folderIcon { font-size: var(--fs-base); width: 20px; text-align: center; }
+.folderIcon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.folderItem:hover .folderIcon { color: var(--text-primary); }
 .folderLabel { flex: 1; }
 .folderBadge {
   min-width: 20px;

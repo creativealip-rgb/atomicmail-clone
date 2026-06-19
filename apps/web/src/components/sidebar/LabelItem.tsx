@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAppDispatch } from "@/hooks/redux";
 import { setActive } from "@/store/slices/foldersSlice";
 import styles from "./Sidebar.module.css";
@@ -19,15 +19,17 @@ export function LabelItem({ label, count, onDelete }: Props) {
 
   return (
     <li className={styles.labelItem}>
-      <Link
+      <NavLink
         to={`/app/label/${label.id}`}
-        className={styles.folderItem}
+        className={({ isActive }) =>
+          isActive ? `${styles.folderItem} ${styles.active}` : styles.folderItem
+        }
         onClick={() => dispatch(setActive(label.id))}
       >
         <span className={styles.labelDot} style={{ background: label.color }} aria-hidden />
         <span className={styles.folderLabel}>{label.name}</span>
         {count > 0 && <span className={styles.folderBadge}>{count}</span>}
-      </Link>
+      </NavLink>
       <button
         className={styles.labelDelete}
         aria-label={`Delete label ${label.name}`}

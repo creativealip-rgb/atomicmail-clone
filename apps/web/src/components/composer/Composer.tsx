@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { close, update } from "@/store/slices/composerSlice";
 import { sendMessage } from "@/store/slices/messagesSlice";
@@ -27,6 +27,7 @@ export function Composer() {
   const [error, setError] = useState<string | null>(null);
   const [showCc, setShowCc] = useState(composer.cc.length > 0);
   const [showBcc, setShowBcc] = useState(composer.bcc.length > 0);
+  const toRef = useRef<HTMLInputElement | null>(null);
 
   // Default "from" = first alias (the API will pick the same one if aliasId omitted)
   const fromAlias = useMemo(() => {
@@ -50,8 +51,28 @@ export function Composer() {
       setError(null);
       setShowCc(composer.cc.length > 0);
       setShowBcc(composer.bcc.length > 0);
+      // Autofocus the "To" field on next tick so the modal is mounted first
+      const t = window.setTimeout(() => toRef.current?.focus(), 0);
+      // Lock background scroll while the modal is open
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        window.clearTimeout(t);
+        document.body.style.overflow = prevOverflow;
+      };
     }
+    return undefined;
   }, [composer.open]); // intentionally only on open
+
+  // Escape to close — only attached while open
+  useEffect(() => {
+    if (!composer.open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !sending) dispatch(close());
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [composer.open, sending, dispatch]);
 
   if (!composer.open) return null;
 
@@ -140,6 +161,7 @@ export function Composer() {
           </label>
           <input
             id="composer-to"
+            ref={toRef}
             className={styles.input}
             type="text"
             placeholder="recipient@example.com, another@example.com"
