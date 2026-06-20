@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { signIn } from "@/store/slices/authSlice";
 import { Logo } from "@/components/brand/Logo";
@@ -11,12 +11,15 @@ export default function SignInPage() {
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((s) => s.auth);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: { pathname?: string; search?: string } } | null)?.from;
+  const redirectTo = from?.pathname ? `${from.pathname}${from.search ?? ""}` : "/app/mailbox/inbox";
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const result = await dispatch(signIn({ email, password }));
     if (signIn.fulfilled.match(result)) {
-      navigate("/app/mailbox/inbox", { replace: true });
+      navigate(redirectTo, { replace: true });
     }
   };
 

@@ -7,6 +7,8 @@ import { fetchMessages } from "@/store/slices/messagesSlice";
 import { push as pushToast } from "@/store/slices/notificationsSlice";
 import styles from "./Composer.module.css";
 
+const DRAFT_KEY = "chainmail.composer.draft";
+
 function parseRecipients(raw: string): string[] {
   return raw
     .split(/[,;\s]+/)
@@ -43,15 +45,45 @@ export function Composer() {
     }
   }, [composer.open, aliases.length, isAuth, dispatch]);
 
-  // Reset local state when composer opens fresh
+  // Reset local state when composer opens fresh, restoring last autosaved draft if present.
   useEffect(() => {
     if (composer.open) {
-      setToRaw(composer.to.join(", "));
-      setCcRaw(composer.cc.join(", "));
-      setBccRaw(composer.bcc.join(", "));
+      const rawDraft = localStorage.getItem(DRAFT_KEY);
+      let restored = false;
+      if (rawDraft && !composer.subject && !composer.body && composer.to.length === 0) {
+        try {
+          const draft = JSON.parse(rawDraft) as {
+            to?: string[];
+            cc?: string[];
+            bcc?: string[];
+            subject?: string;
+            body?: string;
+          };
+          dispatch(update({
+            to: draft.to ?? [],
+            cc: draft.cc ?? [],
+            bcc: draft.bcc ?? [],
+            subject: draft.subject ?? "",
+            body: draft.body ?? "",
+          }));
+          setToRaw((draft.to ?? []).join(", "));
+          setCcRaw((draft.cc ?? []).join(", "));
+          setBccRaw((draft.bcc ?? []).join(", "));
+          setShowCc((draft.cc ?? []).length > 0);
+          setShowBcc((draft.bcc ?? []).length > 0);
+          restored = true;
+        } catch {
+          localStorage.removeItem(DRAFT_KEY);
+        }
+      }
+      if (!restored) {
+        setToRaw(composer.to.join(", "));
+        setCcRaw(composer.cc.join(", "));
+        setBccRaw(composer.bcc.join(", "));
+        setShowCc(composer.cc.length > 0);
+        setShowBcc(composer.bcc.length > 0);
+      }
       setError(null);
-      setShowCc(composer.cc.length > 0);
-      setShowBcc(composer.bcc.length > 0);
       // Autofocus the "To" field on next tick so the modal is mounted first
       const t = window.setTimeout(() => toRef.current?.focus(), 0);
       // Lock background scroll while the modal is open
@@ -77,8 +109,42 @@ export function Composer() {
 
   if (!composer.open) return null;
 
+  const saveDraftIfNeeded = () => {
+    const to = parseRecipients(toRaw);
+    const cc = showCc ? parseRecipients(ccRaw) : [];
+    const bcc = showBcc ? parseRecipients(bccRaw) : [];
+    const hasContent =
+      to.length > 0 ||
+      cc.length > 0 ||
+      bcc.length > 0 ||
+      composer.subject.trim().length > 0 ||
+      composer.body.trim().length > 0;
+    if (!hasContent) {
+      localStorage.removeItem(DRAFT_KEY);
+      return;
+    }
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        to,
+        cc,
+        bcc,
+        subject: composer.subject,
+        body: composer.body,
+        savedAt: new Date().toISOString(),
+      }),
+    );
+  };
+
   const handleClose = () => {
     if (sending) return;
+    saveDraftIfNeeded();
+    dispatch(close());
+  };
+
+  const handleDiscard = () => {
+    if (sending) return;
+    localStorage.removeItem(DRAFT_KEY);
     dispatch(close());
   };
 
@@ -120,6 +186,7 @@ export function Composer() {
             message: `Message queued to ${to}`,
           }),
         );
+        localStorage.removeItem(DRAFT_KEY);
         dispatch(fetchMessages({ folder: "sent" }));
         dispatch(close());
       } else {
@@ -284,10 +351,18 @@ export function Composer() {
             <button
               type="button"
               className={styles.cancelBtn}
-              onClick={handleClose}
+              onClick={handleDiscard}
               disabled={sending}
             >
               Discard
+            </button>
+            <button
+              type="button"
+              className={styles.cancelBtn}
+              onClick={handleClose}
+              disabled={sending}
+            >
+              Save draft
             </button>
             <button
               type="button"

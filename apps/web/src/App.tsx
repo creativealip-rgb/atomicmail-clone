@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, type ReactElement } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Spinner } from "@ui/ui";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { open as openComposer } from "@/store/slices/composerSlice";
@@ -8,6 +8,7 @@ import { dismiss as dismissToast } from "@/store/slices/notificationsSlice";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { ProfileModal } from "@/components/profile/ProfileModal";
+import { PrivacyCenter } from "@/components/privacy/PrivacyCenter";
 
 // Landing is loaded immediately (it's the homepage)
 import LandingPage from "@/routes/LandingPage";
@@ -127,6 +128,24 @@ function AuthHydrator() {
   return null;
 }
 
+function RequireAuth({ children }: { children: ReactElement }) {
+  const location = useLocation();
+  const { isAuthenticated, status, user } = useAppSelector((s) => s.auth);
+  const demoMode = useAppSelector((s) => s.auth.demoMode) || import.meta.env.VITE_DEMO === "true";
+
+  if (demoMode) return children;
+
+  if (status === "loading" || (isAuthenticated && !user)) {
+    return <Spinner fullscreen />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/app/auth/sign-in" replace state={{ from: location }} />;
+  }
+
+  return children;
+}
+
 export function App() {
   return (
     <ErrorBoundary>
@@ -135,6 +154,7 @@ export function App() {
       <GlobalShortcuts />
       <ToastContainer />
       <ProfileModalGate />
+      <PrivacyCenter />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route
@@ -143,10 +163,10 @@ export function App() {
             <Suspense fallback={<Spinner fullscreen />}>
               <Routes>
                 <Route path="auth/*" element={<AuthLayout />} />
-                <Route path="mailbox/:mailbox" element={<MailboxRoute />} />
-                <Route path="label/:labelId" element={<MailboxRoute labelView />} />
-                <Route path="mailbox/:mailbox/message/:id" element={<MessageRoute />} />
-                <Route path="ledger" element={<LedgerRoute />} />
+                <Route path="mailbox/:mailbox" element={<RequireAuth><MailboxRoute /></RequireAuth>} />
+                <Route path="label/:labelId" element={<RequireAuth><MailboxRoute labelView /></RequireAuth>} />
+                <Route path="mailbox/:mailbox/message/:id" element={<RequireAuth><MessageRoute /></RequireAuth>} />
+                <Route path="ledger" element={<RequireAuth><LedgerRoute /></RequireAuth>} />
                 <Route path="encrypted/:key" element={<EncryptedRoute />} />
                 <Route path="setup-recovery" element={<RecoverySetupPage />} />
                 <Route index element={<AuthLayout />} />

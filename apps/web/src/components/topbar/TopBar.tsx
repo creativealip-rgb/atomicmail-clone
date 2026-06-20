@@ -2,16 +2,30 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { setSearchQuery } from "@/store/slices/uiSlice";
 import { AvatarMenu } from "./AvatarMenu";
+import type { User } from "@ui/shared-types";
 import { ThemeToggle } from "./ThemeToggle";
-import { signOut } from "@/store/slices/authSlice";
 import { isDemoMode } from "@/services/api/client";
 import styles from "./TopBar.module.css";
 
 export function TopBar() {
   const dispatch = useAppDispatch();
   const query = useAppSelector((s) => s.ui.searchQuery);
-  const user = useAppSelector((s) => s.user.profile);
   const auth = useAppSelector((s) => s.auth);
+  const profile = useAppSelector((s) => s.user.profile);
+  const authUser = auth.user
+    ? ({
+        ...auth.user,
+        displayName: auth.user.email.split("@")[0],
+        publicKey: auth.user.publicKey ?? "",
+        signPublicKey: "",
+        createdAt: auth.user.createdAt,
+        timezone: "UTC",
+        twoFactorEnabled: false,
+        language: "en-US",
+        theme: "system",
+      } as User)
+    : null;
+  const user = authUser ?? profile;
   const [search, setSearch] = useState(query);
 
   return (
@@ -29,13 +43,6 @@ export function TopBar() {
       {auth.isAuthenticated && (
         <div className={styles.liveBadge} role="status">
           <span>LIVE — {auth.user?.email ?? "signed in"}</span>
-          <button
-            type="button"
-            className={styles.signOutBtn}
-            onClick={() => dispatch(signOut())}
-          >
-            sign out
-          </button>
         </div>
       )}
       <form

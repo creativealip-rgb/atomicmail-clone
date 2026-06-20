@@ -3,13 +3,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  padding: 0 var(--space-5);
+  padding: 0 22px;
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 92%, var(--bg-base));
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
   flex-wrap: nowrap;
+  backdrop-filter: blur(10px);
 }
 
 .demoBadge {
@@ -34,13 +35,14 @@
 .liveBadge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  height: 26px;
-  padding: 0 var(--space-3);
-  background: rgba(15, 118, 110, 0.1);
+  gap: 7px;
+  height: 24px;
+  padding: 0 10px;
+  background: rgba(15, 118, 110, 0.09);
   color: #0f766e;
-  font-size: 11px;
-  font-weight: var(--fw-semibold);
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid rgba(15, 118, 110, 0.12);
   border-radius: var(--r-pill);
   white-space: nowrap;
   flex-shrink: 0;
@@ -238,4 +240,116 @@
   .liveBadge { max-width: 96px; overflow: hidden; }
   .composeBtn { padding: 0 var(--space-2); }
   .searchInput { height: 34px; }
+}
+
+/* r19 topbar polish */
+.topbar {
+  min-height: 54px;
+  height: 54px;
+  padding: 0 var(--space-6);
+  background: rgba(255,255,255,.96);
+}
+.liveBadge {
+  height: 24px;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #047857;
+}
+.signOutBtn {
+  height: 24px;
+  border-radius: var(--r-full);
+  color: #64748b;
+}
+.search {
+  max-width: 520px;
+  flex-basis: 520px;
+}
+.searchInput {
+  height: 34px;
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+.themeToggle,
+.avatarBtn { width: 32px; height: 32px; }
+
+@media (max-width: 760px) {
+  .topbar { height: auto; min-height: 54px; padding: var(--space-3) var(--space-4); }
+}
+
+/* r21 topbar unclutter */
+.topbar { gap: var(--space-3); }
+.liveBadge { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+.liveBadge span { overflow: hidden; text-overflow: ellipsis; }
+.search { margin-left: var(--space-2); }
+/* r30 topbar + receipt hard cleanup */
+.topbar {
+  display: grid !important;
+  grid-template-columns: minmax(150px, max-content) minmax(220px, 1fr) auto !important;
+  align-items: center !important;
+  gap: 14px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  padding: 0 24px !important;
+}
+.liveBadge {
+  min-width: 0 !important;
+  max-width: 240px !important;
+  justify-self: start !important;
+}
+.liveBadge span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.search {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  flex: initial !important;
+}
+.right {
+  justify-self: end !important;
+  flex: 0 0 auto !important;
+}
+.avatarBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #e0f2fe !important;
+  border: 1px solid #bae6fd !important;
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+/* r38 responsive topbar */
+@media (max-width: 900px) {
+  .topbar {
+    grid-template-columns: minmax(120px, max-content) minmax(160px, 1fr) auto !important;
+    gap: 10px !important;
+    padding: 0 16px !important;
+  }
+  .liveBadge { max-width: 180px !important; }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "live actions"
+      "search search" !important;
+    height: auto !important;
+    min-height: 92px !important;
+    padding: 10px 12px !important;
+    gap: 8px 10px !important;
+  }
+  .liveBadge { grid-area: live !important; max-width: 100% !important; }
+  .search { grid-area: search !important; min-width: 0 !important; }
+  .right { grid-area: actions !important; }
+  .searchInput { height: 34px !important; }
+}
+
+@media (max-width: 420px) {
+  .topbar { padding: 9px 10px !important; }
+  .liveBadge { max-width: 150px !important; }
+  .liveBadge span { display: none !important; }
 }

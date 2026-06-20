@@ -1,8 +1,9 @@
 # Chainmail — Plan
 
-> **Status**: 🟡 Planning v0.1 · 2026-06-18
-> **Repo**: `/root/projects/atomicmail-clone` (renaming to `chainmail` after branding lock)
-> **Live demo**: `https://chainmail.168-144-37-19.sslip.io` (after deploy; current `atomicmail-clone.168-144-37-19.sslip.io`)
+> **Status**: 🟢 MVP live QA · 2026-06-20
+> **Repo**: `/root/projects/chainmail`
+> **Live web**: `https://chainmail.168-144-37-19.sslip.io`
+> **Live API**: `https://api.chainmail.168-144-37-19.sslip.io/api/health`
 
 ---
 
@@ -131,58 +132,41 @@ Before public launch:
 
 ## 7. Tech architecture
 
-### 7.1 Current state (115 source files)
+### 7.1 Current state (MVP live QA)
 
+```text
+chainmail/
+├── apps/web/                 # React 18 + Vite 6 SPA
+├── services/api/             # Hono API + Drizzle + Postgres + realtime + outbound relay
+├── services/parsers/         # receipt parsers + golden tests
+├── packages/crypto/          # WebCrypto helpers
+├── packages/ui/              # shared UI primitives
+├── packages/shared-types/    # shared contracts
+├── docs/                     # product/design/architecture docs
+├── Dockerfile                # nginx SPA image
+└── services/api/Dockerfile   # API image
 ```
-atomicmail-clone/                    # rename → chainmail
-├── apps/
-│   └── web/                         # React 19 + Vite 6 + TS 5.7 SPA
-│       ├── src/
-│       │   ├── components/
-│       │   │   ├── landing/         # Hero, Features, TechStack, DesignSystem, Architecture, CTA, Footer
-│       │   │   ├── mailbox/         # MailboxView, MessageList, MessageRow, ActionToolbar
-│       │   │   ├── message/         # MessageView
-│       │   │   ├── sidebar/         # Sidebar, FolderItem, AliasesList
-│       │   │   └── topbar/          # TopBar, AvatarMenu, ThemeToggle
-│       │   ├── routes/              # LandingPage, AuthLayout, MailboxRoute, MessageRoute, EncryptedRoute, auth/* (SignIn, SignUp, Welcome, Recovery)
-│       │   ├── services/
-│       │   │   ├── api/client.ts    # ⚠️ stub
-│       │   │   ├── crypto/decrypt.ts
-│       │   │   ├── demo/seed.ts     # VITE_DEMO bypass
-│       │   │   ├── realtime/socket.ts # ⚠️ stub
-│       │   │   └── storage/localforage.ts
-│       │   ├── store/
-│       │   │   ├── middleware/socketMiddleware.ts # ⚠️ stub
-│       │   │   └── slices/          # 10 slices: auth, aliases, messages, folders, composer, encryption, notifications, ui, user
-│       │   ├── stories/             # Storybook: Avatar, Button, Dialog, Input, Spinner, Switch
-│       │   ├── styles/              # tokens.css (full design system), globals.css
-│       │   ├── App.tsx              # Routes: /, /app/* (auth, mailbox, encrypted)
-│       │   └── main.tsx
-│       ├── .storybook/
-│       └── package.json
-├── packages/
-│   ├── crypto/                      # WebCrypto wrappers (Ed25519, secp256k1, AES-GCM, scrypt, pbkdf2, BIP39) — @noble/* not yet installed
-│   ├── ui/                          # Radix-based primitives (Button, Input, Avatar, Spinner, Switch, Tooltip, Dialog, DropdownMenu, Popover)
-│   └── shared-types/                # TS types
-├── docs/
-│   ├── desain.md                    # 25KB design system analysis (cloned from atomicmail.io)
-│   └── struktur.md                  # 27KB architecture analysis
-├── Dockerfile                       # nginx-based SPA
-├── docker-compose.yml
-├── pnpm-workspace.yaml
-└── package.json
-```
+
+**Live deploys**:
+
+| Service | Image | Container | IP | Notes |
+|---|---|---|---|---|
+| Web | `chainmail-web:qa-polish-r33` | `chainmail-web-v2` | `10.0.1.73` | draft autosave + Privacy Center |
+| API | `chainmail-api:w9-relay` | `chainmail-api` | `10.0.1.74` | outbound Resend relay worker |
 
 **Status**:
-- ✅ Frontend SPA complete (UI shell, all routes, demo mode)
-- ✅ Design system tokens
-- ✅ Storybook 8.4
-- ❌ **Backend — none**
-- ❌ Real auth — mocked
-- ❌ Realtime — stub
-- ❌ Email ingestion parser — none
-- ❌ Persistence beyond localforage
-- ❌ `@noble/*` crypto installed (only WebCrypto primitives scaffolded)
+- ✅ Frontend SPA live: auth, inbox, sent, message detail, ledger, labels, aliases, profile
+- ✅ Backend live: Hono + Drizzle + Postgres, JWT auth, `/api/health`, `/api/messages`, `/api/ledger`, `/api/ingest`
+- ✅ Parser package: 28/28 tests passing (Coinbase, Binance, Etherscan, Indodax, Kraken, Tokocrypto, Uniswap, OpenSea, Phantom, MetaMask)
+- ✅ Realtime server attached via Socket.IO `/engine.io`
+- ✅ Inbound ingest route stores encrypted body and emits `message.created`
+- ✅ Composer queue flow: `POST /api/messages` creates outbound `status=queued` in Sent
+- ✅ Draft autosave: localStorage restore/discard
+- ✅ Privacy Center overlay implemented
+- ✅ Outbound relay worker deployed; disabled safely when `RESEND_API_KEY` absent
+- ⚠️ Actual outbound delivery pending provider config (`RESEND_API_KEY`, `OUTBOUND_FROM_EMAIL`)
+- ⚠️ Full live ingest realtime test pending `INGEST_SECRET` harness
+- ⚠️ Real MX/SMTP inbound path pending domain/DNS setup
 
 ### 7.2 Target architecture (post-MVP)
 

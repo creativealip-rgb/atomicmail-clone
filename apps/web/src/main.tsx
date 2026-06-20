@@ -11,6 +11,14 @@ import { DEMO_USER, DEMO_FOLDERS } from "@/services/demo/seed";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
 
+// Dark mode is disabled for now. Force light before any route renders.
+try {
+  document.documentElement.setAttribute("data-theme", "light");
+  localStorage.setItem("chainmail.theme", "light");
+} catch {
+  /* noop */
+}
+
 // Demo mode: bootstrap auth + folders so the dashboard is fully populated
 // without ever calling the real chainmail.app API.
 if (isDemoMode()) {

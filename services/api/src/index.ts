@@ -19,6 +19,7 @@ import { foldersRoute } from "./routes/folders.js";
 import { ledgerRoute } from "./routes/ledger.js";
 import { errorHandler } from "./middleware/error.js";
 import { attachRealtime } from "./lib/realtime.js";
+import { startOutboundRelay } from "./lib/outboundRelay.js";
 import type { ChainmailVars } from "./middleware/auth.js";
 
 const app = new Hono<{ Variables: ChainmailVars }>();
@@ -66,4 +67,5 @@ attachRealtime(httpServer);
 
 httpServer.listen(port, hostname, () => {
   console.log(`[chainmail-api] listening on ${hostname}:${port}`);
+  startOutboundRelay();
 });

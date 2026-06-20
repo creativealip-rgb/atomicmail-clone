@@ -12,6 +12,9 @@ const envSchema = z.object({
   INGEST_SECRET: z.string().min(32).default("dev-ingest-secret-change-in-prod-32chars"),
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  // Optional outbound relay. If absent, queued outbound stays unsent until worker config exists.
+  RESEND_API_KEY: z.string().optional(),
+  OUTBOUND_FROM_EMAIL: z.string().email().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

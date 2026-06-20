@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { ApiMessageDetail, ApiReceipt } from "@/store/slices/messagesSlice";
 import { decryptMessageBody, getUnlockedKey, type KeyPair } from "@/services/crypto/vault";
@@ -32,6 +32,8 @@ export function MessageView({ messageId }: Props) {
   const [decryptedBody, setDecryptedBody] = useState<string | null>(null);
   const [decrypting, setDecrypting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const dispatch = useDispatch();
   const userId = useSelector((s: RootState) => s.auth.user?.id);
   const demoMode = useSelector((s: RootState) => s.auth.demoMode);
 
@@ -66,6 +68,10 @@ export function MessageView({ messageId }: Props) {
     } finally {
       setExporting(false);
     }
+  }
+
+  function notify(message: string) {
+    dispatch(pushToast({ type: "info", message }));
   }
 
   // Fetch message + receipt
@@ -171,22 +177,15 @@ export function MessageView({ messageId }: Props) {
         </div>
       )}
       <nav className={styles.topActions} aria-label="Message toolbar">
-        <button className={styles.toolbarBtn} title="Back">←</button>
-        <button className={styles.toolbarBtn} title="Archive">
+        <button className={styles.toolbarBtn} title="Back" onClick={() => window.history.back()}>←</button>
+        <button className={styles.toolbarBtn} title="Archive" onClick={() => notify("Archive action belum aktif")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <rect x="3" y="4" width="18" height="4" rx="1" />
             <path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8" />
             <path d="M10 12h4" />
           </svg>
         </button>
-        <button className={styles.toolbarBtn} title="Report spam">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M8.5 3h7L21 8.5v7L15.5 21h-7L3 15.5v-7L8.5 3z" />
-            <path d="M12 8v5" />
-            <path d="M12 17h.01" />
-          </svg>
-        </button>
-        <button className={styles.toolbarBtn} title="Delete">
+        <button className={styles.toolbarBtn} title="Delete" onClick={() => notify("Delete action belum aktif")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polyline points="3 6 5 6 21 6" />
             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
@@ -194,13 +193,9 @@ export function MessageView({ messageId }: Props) {
             <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
           </svg>
         </button>
-        <button className={styles.toolbarBtn} title="Mark unread">✉</button>
-        <button className={styles.toolbarBtn} title="Move">▣</button>
-        <button className={styles.toolbarBtn} title="More">⋮</button>
+        <button className={styles.toolbarBtn} title="More" onClick={() => notify("More actions belum aktif")}>⋮</button>
         <span className={styles.spacer} />
         <span className={styles.messageCount}>1 of 15</span>
-        <button className={styles.toolbarBtn} title="Previous">‹</button>
-        <button className={styles.toolbarBtn} title="Next">›</button>
         <button
           className={styles.exportBtn}
           title="Export all your receipts as CSV"
@@ -238,30 +233,53 @@ export function MessageView({ messageId }: Props) {
           </div>
           <div className={styles.senderActions}>
             <time className={styles.timestamp}>{new Date(msg.receivedAt).toLocaleString()}</time>
-            <button className={styles.toolbarBtn} title="Star">☆</button>
-            <button className={styles.toolbarBtn} title="Reply">↩</button>
-            <button className={styles.toolbarBtn} title="More">⋮</button>
           </div>
         </div>
       </header>
 
       {receipt && (
-        <section className={styles.receipt}>
-          <div className={styles.receiptIcon} aria-hidden>₿</div>
+        <section className={styles.receipt} data-expanded={detailsOpen}>
+          <div className={styles.receiptIcon} aria-hidden>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16l-4-2-4 2-4-2-4 2V5Z" />
+              <path d="M8 7h8" />
+              <path d="M8 11h8" />
+              <path d="M8 15h5" />
+            </svg>
+          </div>
           <div className={styles.receiptSummary}>
-            <h2 className={styles.receiptTitle}>Crypto receipt detected</h2>
-            <div className={styles.receiptLinePrimary}>
-              <span className={styles.receiptType}>{receipt.type}</span>
-              {receipt.amount != null && <span>{formatAmount(receipt.amount)} {receipt.asset}</span>}
-              {receipt.chain && <span className={styles.receiptPill}>{receipt.chain}</span>}
-              {receipt.counterparty && <span>{receipt.counterparty}</span>}
+            <div className={styles.receiptEyebrow}>
+              <span className={styles.receiptStatusDot} aria-hidden />
+              Parsed receipt
             </div>
-            <div className={styles.receiptLineSecondary}>
-              {receipt.pricePerUnit != null && <span>{receipt.pricePerUnit} {receipt.fiat ?? ""} / unit</span>}
-              {receipt.fiatAmount != null && <span>Total {receipt.fiatAmount} {receipt.fiat ?? ""}</span>}
+            <div className={styles.receiptCompactLine}>
+              {receipt.amount != null && <strong className={styles.receiptAmount}>{formatAmount(receipt.amount)} {receipt.asset}</strong>}
+              <span className={styles.receiptSentence}>
+                {receipt.type ? `${receipt.type.toLowerCase()} ` : ""}
+                {receipt.counterparty ? `on ${receipt.counterparty}` : receipt.chain ? `via ${receipt.chain}` : "transaction"}
+              </span>
+              <div className={styles.receiptChips}>
+                {receipt.chain && <span className={styles.receiptPill}>{receipt.chain}</span>}
+                {receipt.fiatAmount != null && <span className={styles.receiptTotal}>Total {receipt.fiatAmount} {receipt.fiat ?? ""}</span>}
+              </div>
             </div>
           </div>
-          <button className={styles.receiptDetails} title="Receipt details">Details</button>
+          <button
+            className={styles.receiptDetails}
+            title="Receipt details"
+            aria-expanded={detailsOpen}
+            onClick={() => setDetailsOpen((v) => !v)}
+          >
+            {detailsOpen ? "Hide" : "Details"}
+          </button>
+          {detailsOpen && (
+            <dl className={styles.receiptMeta}>
+              <div><dt>Type</dt><dd>{receipt.type}</dd></div>
+              <div><dt>Asset</dt><dd>{receipt.amount != null ? `${formatAmount(receipt.amount)} ${receipt.asset}` : receipt.asset}</dd></div>
+              <div><dt>Source</dt><dd>{receipt.counterparty ?? receipt.chain ?? "—"}</dd></div>
+              <div><dt>Total</dt><dd>{receipt.fiatAmount != null ? `${receipt.fiatAmount} ${receipt.fiat ?? ""}` : "—"}</dd></div>
+            </dl>
+          )}
         </section>
       )}
       <section className={styles.bodyShell} aria-label="Message body">

@@ -1,107 +1,151 @@
-# Chainmail — Plan
+# Chainmail
 
-> **Status**: 🟡 Planning v0.1 · 2026-06-18
-> **Repo**: `/root/projects/atomicmail-clone` (renaming to `chainmail` after branding lock)
-> **Live demo**: `https://chainmail.168-144-37-19.sslip.io` (after deploy; current `atomicmail-clone.168-144-37-19.sslip.io`)
-> **Full plan**: see [`PLAN.md`](./PLAN.md)
+> **Status**: MVP polish / live QA · 2026-06-20  
+> **Repo**: `/root/projects/chainmail`  
+> **Live web**: https://chainmail.168-144-37-19.sslip.io  
+> **Live API**: https://api.chainmail.168-144-37-19.sslip.io/api/health  
+> **Current status doc**: [`docs/status.md`](./docs/status.md)
 
-> E2E encrypted email client · React + Vite + TypeScript pnpm workspace
->
-> Reverse-engineered from [atomicmail.io](https://atomicmail.io).
-> Full architecture & design analysis in [`docs/`](./docs).
+Encrypted second inbox for on-chain receipts. Forward crypto exchange / wallet / explorer emails into Chainmail, auto-parse them into structured receipts, and export ledger-ready CSV. Gmail stays primary.
 
-## Status
+## Current live status
 
-🚧 **Boilerplate only.** Skeletons for all major components, real crypto, design system, and Storybook stories are wired in. Crypto primitives (Ed25519, secp256k1, BIP39) need `@noble/*` installed for full implementation.
+Verified live with `alip3@chainmail.test`:
+
+- Web SPA: up behind Traefik.
+- API: up, DB healthy.
+- Auth: sign-in, sign-up API, `/me`, route guard.
+- Mailbox: inbox/sent/detail, read state, move/archive/trash actions.
+- Composer: outbound queue flow, sent folder, local draft autosave.
+- Parsed receipts: compact summary bar + details expansion.
+- Ledger: 2026 rollup, per-asset/source/chain/month sections, CSV export.
+- Labels: list/create/delete/assign endpoints.
+- Aliases: list/create/delete endpoints.
+- Profile: avatar/menu/modal.
+- Privacy Center: modal implemented.
+- UI polish: landing/auth/inbox/message detail polished, responsive breakpoints added, dark mode disabled/forced light for now.
+- Parsers: 28/28 tests pass.
+- Outbound relay: worker deployed, disabled until `RESEND_API_KEY` configured.
+
+## Latest deploys
+
+| Service | Image | Container | IP | Notes |
+|---|---|---|---|---|
+| Web | `chainmail-web:auth-light-r46` | `chainmail-web-v2` | `10.0.1.88` | light-mode public/auth polish; dark mode disabled |
+| API | `chainmail-api:w9-relay` | `chainmail-api` | `10.0.1.74` | outbound Resend relay worker |
+
+Traefik dynamic configs:
+
+```text
+/etc/dokploy/traefik/dynamic/chainmail.yml
+/etc/dokploy/traefik/dynamic/chainmail-api.yml
+```
 
 ## Stack
 
 - **Web**: React 18 + Vite 6 + TypeScript 5.7
-- **UI**: Radix UI primitives + CSS Modules (BEM naming)
 - **State**: Redux Toolkit + react-redux
-- **HTTP**: ky (fetch wrapper) + swr (cache)
-- **Realtime**: socket.io-client
-- **Storage**: localforage → IndexedDB
-- **Editor**: Jodit + Slate (lazy-loaded)
-- **Icons**: Tabler Icons
-- **Design tokens**: CSS custom properties (see `src/styles/tokens.css`)
-- **Storybook**: 8.4 with Vite
+- **UI**: CSS Modules + Radix primitives
+- **API**: Hono + Drizzle ORM
+- **DB**: Postgres 16
+- **Realtime**: Socket.IO at `/engine.io`
+- **Parsers**: private parser package for CEX/DEX/NFT/wallet/explorer receipts
+- **Crypto**: WebCrypto wrappers + encrypted inbound body path
+- **Deploy**: Docker + nginx SPA + Dokploy/Traefik
 
-## Structure
+## Workspace structure
 
-```
-atomicmail-clone/
-├── apps/
-│   └── web/                  # React SPA
-│       ├── src/
-│       │   ├── components/   # sidebar, topbar, mailbox, message, modals
-│       │   ├── routes/       # AuthLayout, MailboxRoute, MessageRoute, EncryptedRoute
-│       │   ├── store/        # Redux store + 9 slices + socket middleware
-│       │   ├── services/     # api, crypto, storage, realtime
-│       │   ├── styles/       # tokens.css, globals.css
-│       │   ├── stories/      # Storybook stories
-│       │   ├── hooks/        # useAppDispatch, useAppSelector
-│       │   ├── App.tsx
-│       │   └── main.tsx
-│       ├── .storybook/       # Storybook config
-│       └── package.json
-├── packages/
-│   ├── crypto/               # WebCrypto wrappers (Ed25519, secp256k1, AES-GCM, scrypt, pbkdf2, BIP39)
-│   ├── ui/                   # Radix-based primitives (Button, Input, Avatar, Spinner, Switch, Tooltip, Dialog, DropdownMenu, Popover)
-│   └── shared-types/         # TypeScript types shared across apps
-└── docs/
-    ├── struktur.md           # Architecture, routes, storage, crypto pipeline
-    └── desain.md             # Design system, colors, typography, components
+```text
+chainmail/
+├── apps/web/                 # React SPA
+├── services/api/             # Hono API + Drizzle + realtime + outbound relay
+├── services/parsers/         # receipt parser package + fixtures/tests
+├── packages/crypto/          # crypto helpers
+├── packages/ui/              # shared UI primitives
+├── packages/shared-types/    # shared TS types
+├── docs/                     # product/architecture/design docs
+├── Dockerfile                # web image
+└── services/api/Dockerfile   # API image
 ```
 
-## Quick start
+## Commands
 
 ```bash
 # install
 pnpm install
 
-# run web dev (port 5173)
-pnpm dev
-
-# run storybook (port 6006)
-pnpm storybook
-
-# typecheck
-pnpm typecheck
-
 # build all
-pnpm build
+pnpm -r build
+
+# build web
+pnpm --filter web build
+
+# build API
+pnpm --filter api build
+
+# parser tests
+pnpm --filter parsers test
 ```
 
-## What's implemented
+## Implemented
 
-- [x] Vite + React + TS + RTK scaffold
-- [x] CSS tokens (full design system in tokens.css)
-- [x] Radix-based UI primitives (Button, Input, Avatar, Spinner, Switch, Tooltip, Dialog, DropdownMenu, Popover)
-- [x] 9 Redux slices (auth, messages, folders, aliases, encryption, composer, user, ui, notifications)
-- [x] Socket.IO middleware
-- [x] ky HTTP client + swr fetcher
-- [x] localforage storage wrapper
-- [x] App routes (Auth, Mailbox, Message, Encrypted)
-- [x] Sidebar, TopBar, MailboxView, MessageView skeletons
-- [x] Storybook stories for all primitives
-- [x] Bundle splitting: react / redux / crypto / editor chunks
-- [x] WebCrypto skeleton (AES-GCM done, Ed25519/secp256k1 need @noble)
+- [x] Auth: sign-in, sign-up, `/me`, JWT session, route guard
+- [x] Aliases: list/create/delete
+- [x] Mailbox: inbox/sent/drafts/trash/archive/junk/flagged/important routes
+- [x] Message detail: body, receipt summary, labels, CSV export action
+- [x] Composer: To/Cc/Bcc, validation, queued outbound send, sent folder refresh
+- [x] Draft autosave: localStorage restore + discard
+- [x] Labels: list/create/delete/assign
+- [x] Ledger: tax-year rollup + CSV export
+- [x] Ingest route: `POST /api/ingest`, parser run, encrypted body storage, realtime emit
+- [x] Parser suite: Coinbase, Binance, Etherscan, Indodax, Kraken, Tokocrypto, Uniswap, OpenSea, Phantom, MetaMask
+- [x] Realtime server attached via Socket.IO
+- [x] Profile modal + Privacy Center
+- [x] Inbox/message detail visual polish + responsive CSS breakpoints
+- [x] Dark mode disabled/forced light until redesign is ready
+- [x] Outbound relay worker foundation via Resend
 
-## What's TODO
+## Remaining work
 
-- [ ] Install `@noble/curves`, `@noble/ed25519`, `@noble/hashes`, `@scure/bip39` and implement crypto
-- [ ] Compose modal (Jodit editor + encryption picker + recipient autocomplete)
-- [ ] 2FA setup modal (TOTP QR + code verify)
-- [ ] Alias create flow
-- [ ] Privacy Center sidebar overlay
-- [ ] Settings modal (Account, Plan, Appearance)
-- [ ] Real API integration (currently `api.atomicmail.io` mock)
-- [ ] Auth flow wiring (sign-in 2-step form)
-- [ ] Service worker / PWA support
-- [ ] Skeleton loading states (gap noted in `docs/desain.md` § 13)
-- [ ] Keyboard shortcut for search (Cmd+K) and compose (C)
+- [ ] Configure real outbound provider:
+  ```text
+  RESEND_API_KEY=...
+  OUTBOUND_FROM_EMAIL=...
+  ```
+  Then restart `chainmail-api` and verify `queued → sent`.
+- [ ] Full ingest realtime test using `INGEST_SECRET` and live browser tab.
+- [ ] SMTP/MX inbound path for real forwarded email.
+- [ ] Better composer visual QA and editor upgrade.
+- [ ] Pricing/quote enrichment for ledger USD estimates.
+- [ ] PWA/offline cache if needed.
+
+## Outbound relay
+
+Relay worker lives in:
+
+```text
+services/api/src/lib/outboundRelay.ts
+```
+
+Behavior:
+
+1. Polls queued outbound messages every 15s.
+2. Sends via Resend if `RESEND_API_KEY` exists.
+3. Marks success:
+   ```text
+   status = sent
+   statusDetail = null
+   ```
+4. Marks failure:
+   ```text
+   status = failed
+   statusDetail = <error>
+   ```
+5. If no API key, logs and stays disabled:
+   ```text
+   [outbound-relay] disabled: RESEND_API_KEY not configured
+   ```
 
 ## License
 
-MIT · personal project, not for production use of Atomic Mail's branding.
+MIT for source. Branding/assets reserved until launch decision.

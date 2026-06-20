@@ -72,6 +72,16 @@ export function MailboxView({ mailboxId, labelId }: Props) {
     ? "All Mail"
     : mailboxId;
 
+  const unreadCount = list.filter((m) => !m.readAt).length;
+  const starredCount = list.filter((m) => m.starred).length;
+  const receiptCount = list.filter((m) => m.receiptId || m.parserKey).length;
+  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+  const summary = labelId
+    ? `${plural(filteredList.length, "message")} in label`
+    : mailboxId === "inbox"
+    ? `${plural(list.length, "message")} · ${plural(receiptCount, "parsed receipt")} · ${starredCount} starred`
+    : `${plural(list.length, "message")}${unreadCount ? ` · ${unreadCount} unread` : ""}`;
+
   const emptyHint = labelId
     ? "Apply this label to a message from the message view."
     : mailboxId === "inbox"
@@ -141,8 +151,19 @@ export function MailboxView({ mailboxId, labelId }: Props) {
   return (
     <div className={styles.view}>
       <div className={styles.viewHeader}>
-        <h1 className={styles.viewTitle}>{viewTitle}</h1>
-        <span className={styles.viewCount}>{list.length}</span>
+        <div className={styles.titleBlock}>
+          <div className={styles.titleRow}>
+            <h1 className={styles.viewTitle}>{viewTitle}</h1>
+            <span className={styles.viewCount}>{filteredList.length}</span>
+          </div>
+          <p className={styles.viewSummary}>{summary}</p>
+        </div>
+        {mailboxId === "inbox" && (
+          <div className={styles.receiptPill} aria-label="Parsed receipts">
+            <span className={styles.receiptDot} />
+            Receipts live
+          </div>
+        )}
       </div>
       <ActionToolbar
         activeFolder={activeFolder}

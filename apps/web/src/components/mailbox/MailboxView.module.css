@@ -1,43 +1,74 @@
-.view { display: flex; flex-direction: column; flex: 1; }
+.view { display: flex; flex-direction: column; flex: 1; background: var(--bg-base); }
 
 .viewHeader {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  padding: var(--space-5) var(--space-6) var(--space-4);
-  background: var(--bg-surface);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 18px var(--space-6) 16px;
+  background: linear-gradient(180deg, var(--bg-surface) 0%, color-mix(in srgb, var(--bg-surface) 78%, var(--bg-base)) 100%);
   border-bottom: 1px solid var(--border-subtle);
 }
+.titleBlock { min-width: 0; }
+.titleRow { display: flex; align-items: center; gap: var(--space-3); }
 .viewTitle {
   margin: 0;
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-semibold);
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 720;
   color: var(--text-primary);
   text-transform: capitalize;
+  letter-spacing: -0.025em;
+}
+.viewSummary {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: var(--fw-medium);
 }
 .viewCount {
   display: inline-flex;
   align-items: center;
-  height: 20px;
-  padding: 0 var(--space-2);
-  margin-left: var(--space-1);
+  height: 22px;
+  padding: 0 9px;
   font-size: 11px;
   font-weight: var(--fw-bold);
-  color: var(--text-secondary);
-  background: var(--bg-base);
-  border: 1px solid var(--border-subtle);
+  color: var(--color-brand-blue);
+  background: rgba(6, 125, 247, 0.1);
+  border: 1px solid rgba(6, 125, 247, 0.18);
   border-radius: var(--r-pill);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+}
+.receiptPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  color: #0f766e;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.receiptDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
 }
 
 .toolbar {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
+  padding: 8px var(--space-6);
   border-bottom: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 88%, var(--bg-base));
 }
 .selectAll {
   display: flex;
@@ -187,4 +218,30 @@
     overflow-x: auto;
   }
   .toolbarBtn { white-space: nowrap; }
+}
+
+/* r38 responsive mailbox header */
+@media (max-width: 900px) {
+  .viewHeader { padding: 16px 18px 14px; }
+  .viewTitle { font-size: 22px; }
+}
+
+@media (max-width: 760px) {
+  .viewHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 12px 12px;
+    gap: 10px;
+  }
+  .titleRow { gap: 8px; }
+  .viewTitle { font-size: 20px; }
+  .viewSummary { font-size: 11px; }
+  .receiptPill { height: 26px; padding: 0 10px; font-size: 11px; }
+  .toolbar { padding: 7px 12px; overflow-x: auto; }
+}
+
+@media (max-width: 420px) {
+  .viewHeader { padding: 12px 10px 10px; }
+  .viewSummary { max-width: 220px; }
+  .receiptPill { display: none; }
 }
