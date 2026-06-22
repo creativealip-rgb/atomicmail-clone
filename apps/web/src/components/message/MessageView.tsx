@@ -194,6 +194,26 @@ export function MessageView({ messageId }: Props) {
           </svg>
         </button>
         <button className={styles.toolbarBtn} title="More" onClick={() => notify("More actions belum aktif")}>⋮</button>
+        <div className={styles.toolbarDivider} aria-hidden />
+        <button className={styles.toolbarBtn} title="Reply" onClick={() => notify("Reply belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 17 4 12 9 7" />
+            <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+          </svg>
+        </button>
+        <button className={styles.toolbarBtn} title="Reply all" onClick={() => notify("Reply all belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 17 4 12 9 7" />
+            <polyline points="13 17 8 12 13 7" />
+            <path d="M20 18v-2a4 4 0 0 0-4-4H8" />
+          </svg>
+        </button>
+        <button className={styles.toolbarBtn} title="Forward" onClick={() => notify("Forward belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 17 20 12 15 7" />
+            <path d="M4 18v-2a4 4 0 0 1 4-4h12" />
+          </svg>
+        </button>
         <span className={styles.spacer} />
         <span className={styles.messageCount}>1 of 15</span>
         <button
@@ -311,6 +331,30 @@ export function MessageView({ messageId }: Props) {
           )}
         </div>
       </section>
+      <div className={styles.bottomActions}>
+        <button className={styles.bottomReplyBtn} onClick={() => notify("Reply belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 17 4 12 9 7" />
+            <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+          </svg>
+          Reply
+        </button>
+        <button className={styles.bottomReplyBtn} onClick={() => notify("Reply all belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 17 4 12 9 7" />
+            <polyline points="13 17 8 12 13 7" />
+            <path d="M20 18v-2a4 4 0 0 0-4-4H8" />
+          </svg>
+          Reply all
+        </button>
+        <button className={styles.bottomReplyBtn} onClick={() => notify("Forward belum aktif")}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 17 20 12 15 7" />
+            <path d="M4 18v-2a4 4 0 0 1 4-4h12" />
+          </svg>
+          Forward
+        </button>
+      </div>
     </article>
   );
 }
