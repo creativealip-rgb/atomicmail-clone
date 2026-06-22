@@ -420,7 +420,7 @@ svg {
 html,
 body,
 #root {
-  background: #f6f8fc !important;
+  background: #f6f8fc;
 }
 
 .auth-layout {
@@ -429,19 +429,15 @@ body,
   align-items: flex-start;
   justify-content: center;
   padding: 24px 16px;
-  background:
-    radial-gradient(circle at top left, rgba(6, 125, 247, .12), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(12, 232, 132, .10), transparent 34%),
-    #f6f8fc !important;
-  color: #0f172a !important;
+  background: #0a0a1a;
+  color: #0f172a;
 }
-
 [data-theme="dark"] body,
 [data-theme="dark"] #root,
 [data-theme="dark"] main,
 [data-theme="dark"] .auth-layout {
-  background: #f6f8fc !important;
-  color: #0f172a !important;
+  background: #0a0a1a;
+  color: #0f172a;
 }
 
 @media (max-width: 520px) {

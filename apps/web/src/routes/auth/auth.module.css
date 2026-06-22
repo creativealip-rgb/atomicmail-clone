@@ -5,12 +5,12 @@
 
 /* ─── Full-page dark background ─── */
 .authBg {
+  width: 100%;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: #0a0a1a;
   position: relative;
   overflow: hidden;
 }
