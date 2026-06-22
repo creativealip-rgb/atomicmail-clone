@@ -74,6 +74,7 @@ route.get("/messages", async (c) => {
     fromAddr: string;
     fromName: string | null;
     subject: string | null;
+    bodyText: string | null;
     folder: string;
     starred: boolean;
     parserKey: string | null;
@@ -105,6 +106,7 @@ route.get("/messages", async (c) => {
         fromName: messages.fromName,
         toAddrs: messages.toAddrs,
         subject: messages.subject,
+        bodyText: messages.bodyText,
         folder: messages.folder,
         starred: messages.starred,
         direction: messages.direction,
@@ -130,6 +132,7 @@ route.get("/messages", async (c) => {
         fromName: messages.fromName,
         toAddrs: messages.toAddrs,
         subject: messages.subject,
+        bodyText: messages.bodyText,
         folder: messages.folder,
         starred: messages.starred,
         direction: messages.direction,
@@ -169,11 +172,15 @@ route.get("/messages", async (c) => {
   }
 
   return c.json({
-    messages: rows.map((r) => ({
-      ...r,
-      aliasEmail: userAliases.find((a) => a.id === r.aliasId)?.email,
-      labels: labelsByMsg.get(r.id) ?? [],
-    })),
+    messages: rows.map((r) => {
+      const { bodyText, ...rest } = r;
+      return {
+        ...rest,
+        aliasEmail: userAliases.find((a) => a.id === r.aliasId)?.email,
+        labels: labelsByMsg.get(r.id) ?? [],
+        snippet: bodyText ? bodyText.slice(0, 120).replace(/\s+/g, " ").trim() : null,
+      };
+    }),
     total: rows.length,
     limit: q.data.limit,
     offset: q.data.offset,

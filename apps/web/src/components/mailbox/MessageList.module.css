@@ -1,21 +1,21 @@
 .list {
   list-style: none;
   margin: 0;
-  padding: 8px 12px 18px;
+  padding: 4px 12px 18px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   background: var(--bg-base);
 }
 
 .row {
   position: relative;
   display: grid;
-  grid-template-columns: 86px minmax(0, 1fr) 168px;
+  grid-template-columns: 38px minmax(0, 1fr) 168px;
   align-items: center;
-  gap: 14px;
-  min-height: 60px;
-  padding: 10px 16px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 16px;
   border: 1px solid transparent;
   border-left: 4px solid transparent;
   border-radius: 14px;
@@ -156,6 +156,11 @@
   letter-spacing: -0.01em;
 }
 .subject em { color: var(--text-faint); font-style: italic; font-weight: var(--fw-regular); }
+.snippet {
+  color: var(--text-muted);
+  font-weight: var(--fw-regular);
+  font-size: 13px;
+}
 
 .from {
   font-size: 12px;

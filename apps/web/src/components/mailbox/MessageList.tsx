@@ -289,6 +289,7 @@ export function MessageList({ messages }: Props) {
             <div className={styles.middle}>
               <div className={styles.subject}>
                 {m.subject ?? <em>(no subject)</em>}
+                {m.snippet && <span className={styles.snippet}> — {m.snippet}</span>}
                 {isOutbound && (
                   <span
                     className={styles.statusChip}

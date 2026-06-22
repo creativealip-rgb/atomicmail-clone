@@ -18,6 +18,7 @@ export interface ApiMessage {
   parsedAt: string | null;
   readAt: string | null;
   receivedAt: string;
+  snippet?: string | null;
   labels?: ApiMessageLabel[];
 }
 
