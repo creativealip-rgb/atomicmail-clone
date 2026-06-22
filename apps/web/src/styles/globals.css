@@ -429,14 +429,14 @@ body,
   align-items: flex-start;
   justify-content: center;
   padding: 24px 16px;
-  background: #0a0a1a;
+  background: #f6f8fc;
   color: #0f172a;
 }
 [data-theme="dark"] body,
 [data-theme="dark"] #root,
 [data-theme="dark"] main,
 [data-theme="dark"] .auth-layout {
-  background: #0a0a1a;
+  background: #f6f8fc;
   color: #0f172a;
 }
 
